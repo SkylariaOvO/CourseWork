@@ -1,62 +1,87 @@
-import hashlib
 from django.shortcuts import render, redirect
-from django.db import connection
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.http import HttpResponse
+from django.contrib.auth import authenticate, login, logout
+import re  
 
 def home(request):
-  return render(request, 'index.html')
+    return render(request, 'index.html')
 
-# Hash password function
-def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
-
-# Check if a user exists
-def user_exists(username):
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT 1 FROM UserTbl WHERE username = %s", [username])
-        return cursor.fetchone() is not None
-
-# Register user
 def register(request):
-  """
     if request.method == "POST":
         username = request.POST['username']
+        email = request.POST['email']
         password = request.POST['password']
+        password2 = request.POST['password2']
 
-        if user_exists(username):
-            return render(request, 'auth.html', {'error': 'Username already exists.'})
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Username already exists.')
+            return redirect('register')
 
-        hashed_password = hash_password(password)
-        with connection.cursor() as cursor:
-            cursor.execute("INSERT INTO UserTbl (username, password_hash) VALUES (%s, %s)", [username, hashed_password])
-        return redirect('login')
-  """
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'Email already exists.')
+            return redirect('register')
 
-  return render(request, "register.html")
+        if password != password2:
+            messages.error(request, 'Passwords do not match.')
+            return redirect('register')
+
+        # Check password strength
+        if not re.match(r'^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$', password):
+            messages.error(request, 'Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character.')
+            return redirect('register')
+
+        try:
+            user = User.objects.create_user(username=username, email=email, password=password)
+            user.save()
+            messages.success(request, 'Account created successfully! Please log in.')
+            return redirect('login')
+        except Exception as e:
+            messages.error(request, f'An error occurred: {e}')
+            return redirect('register')
+
+    return render(request, 'register.html')
+
 
 # Login user
-def login(request):
-  """
+def signin(request):
+
     if request.method == "POST":
-        username = request.POST['username']
+        email = request.POST['email']
         password = request.POST['password']
-        hashed_password = hash_password(password)
 
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT password_hash FROM UserTbl WHERE username = %s", [username])
-            result = cursor.fetchone()
-            if result and result[0] == hashed_password:
-                return render(request, 'auth.html', {'success': 'Login successful!'})
-            return render(request, 'auth.html', {'error': 'Invalid username or password.'})
+        try: 
+          user = User.objects.get(email=email)
+        except User.DoesNotExist:
+          messages.error(request,"Invalid Credentials")
+          return redirect("/login")
+          
+        
 
-  """
+        user = authenticate(request, username = user.username, password=password)
 
-  return render(request, "login.html")
+      
+
+        if user is not None:
+          login(request, user)
+          username = user.username
+          return render(request, "index.html",{"username":username})
+
+        else:
+          messages.error(request,"Invalid Credentials")
+          return redirect("login")
+    
+    return render(request, 'login.html')
+
 
 def signout(request):
-    pass
+  logout(request)
+  messages.success(request,"Logged Out Successfully")
+  return redirect("index")
   
 # Reset password
-def reset_password(request):
+def forgot_password(request):
   """
     if request.method == "POST":
         username = request.POST['username']
@@ -72,4 +97,4 @@ def reset_password(request):
 
   """
 
-  return render(request, "reset_password.html")
+  return render(request, "forgot_password.html")

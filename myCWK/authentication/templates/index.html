@@ -10,11 +10,31 @@
       
 </head>
 <body>
-  <h3>Welcome "Need to give a name to my project smh"</h3>
+
+  {% for message in messages %}
+  <div class='alert alert-{{ message.tags }} alert-dismissble fade show' role = 'alert'>
+  <strong>Message:</strong> {{ message }}
+  <button type='button' class='close' data-dismiss='alert' aria-label='close'>
+  <span aria-hidden='true'>&times;</span>
+  </button>
+  </div>
+  {% endfor %}
+  
+  <h3>Welcome to Rugby School Acedemic Discussion Forum and SSS Timetable</h3>
+
+  {% if user.is_authenticated %}
+  <h3>Hello {{ user.username }}</h3>
+  <h4>You are successfully logged in!</h4>
+  <button type="submit"><a href ="/signout">Signout</a></button>
+  {% else %}
+  
   <button type="submit"><a href ="/register">Register</a></button>
   <button type="submit"><a href ="/login">Login</a></button>
-  <button type="submit"><a href ="/signout">Signout</a></button>
-  <button type="submit"><a href ="/reset_password">Reset Password</a></button>
+
+  <button type="submit"><a href ="/forgot_password">Forgot Password</a></button>
+  {% endif %}
+
+  
   <script src="" async defer>  </script>
 
 </body>

@@ -1,5 +1,5 @@
-entrypoint = "main.py"
 modules = ["python-3.11", "postgresql-16"]
+run = "python myCWK/manage.py runserver"
 
 [nix]
 channel = "stable-24_05"
@@ -11,15 +11,20 @@ language = "python3"
 requiredFiles = [".replit", "replit.nix"]
 
 [deployment]
-run = ["python3", "main.py"]
+run = ["sh", "-c", "python manage.py runserver"]
 deploymentTarget = "cloudrun"
+always-on = true
+
+[auth]
+pageEnabled = true
+buttonEnabled = false
 
 [[ports]]
 localPort = 8000
-externalPort = 8080
+externalPort = 8000
 exposeLocalhost = true
 
 [[ports]]
 localPort = 8080
-externalPort = 8000
+externalPort = 80
 exposeLocalhost = true
