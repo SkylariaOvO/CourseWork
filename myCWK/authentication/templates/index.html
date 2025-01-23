@@ -7,35 +7,33 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="">
-      
 </head>
 <body>
 
   {% for message in messages %}
-  <div class='alert alert-{{ message.tags }} alert-dismissble fade show' role = 'alert'>
-  <strong>Message:</strong> {{ message }}
-  <button type='button' class='close' data-dismiss='alert' aria-label='close'>
-  <span aria-hidden='true'>&times;</span>
-  </button>
+  <div class='alert alert-{{ message.tags }} alert-dismissble fade show' role='alert'>
+    <strong>Message:</strong> {{ message }}
+    <button type='button' class='close' data-dismiss='alert' aria-label='close'>
+      <span aria-hidden='true'>&times;</span>
+    </button>
   </div>
   {% endfor %}
   
-  <h3>Welcome to Rugby School Acedemic Discussion Forum and SSS Timetable</h3>
+  <h3>Welcome to Rugby School Academic Discussion Forum and SSS Timetable</h3>
 
   {% if user.is_authenticated %}
-  <h3>Hello {{ user.username }}</h3>
-  <h4>You are successfully logged in!</h4>
-  <button type="submit"><a href ="/signout">Signout</a></button>
+    <h3>Hello {{ user.username }}</h3>
+    <form action="/signout/" method="post">
+      {% csrf_token %}
+      <button type="submit">Sign out</button>
+    </form>
   {% else %}
-  
-  <button type="submit"><a href ="/register">Register</a></button>
-  <button type="submit"><a href ="/login">Login</a></button>
-
-  <button type="submit"><a href ="/forgot_password">Forgot Password</a></button>
+    <a href="/register" class="button">Register</a>
+    <a href="/login" class="button">Login</a>
+    <a href="/forgot_password" class="button">Forgot Password</a>
   {% endif %}
 
-  
-  <script src="" async defer>  </script>
+  <script src="" async defer></script>
 
 </body>
 </html>

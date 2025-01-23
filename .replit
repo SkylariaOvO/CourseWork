@@ -1,5 +1,5 @@
 modules = ["python-3.11", "postgresql-16"]
-run = "python myCWK/manage.py runserver"
+run = "python myCWK/manage.py runserver 0.0.0.0:8000"
 
 [nix]
 channel = "stable-24_05"
@@ -22,7 +22,6 @@ buttonEnabled = false
 [[ports]]
 localPort = 8000
 externalPort = 8000
-exposeLocalhost = true
 
 [[ports]]
 localPort = 8080
