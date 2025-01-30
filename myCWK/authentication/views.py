@@ -7,39 +7,59 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_str, force_bytes
 from django.template.loader import render_to_string
 from django.contrib.auth.tokens import default_token_generator
-
+from django.core.mail import EmailMultiAlternatives, send_mail
+from django.conf import settings
 
 def home(request):
     return render(request, 'index.html')
 
+def send_activation_email(user, request):
+    """
+    Sends an account activation email with a unique token.
+    """
+    uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+    token = default_token_generator.make_token(user)
+    activation_link = f"{request.scheme}://{request.get_host()}/activate/{uidb64}/{token}/"
 
-from django.core.mail import send_mail
-from django.conf import settings
+    # Load email template
+    email_body = render_to_string("emails/activation_email.html", {
+        "username": user.username,
+        "activation_link": activation_link,
+    })
 
-def send_registration_email(to_email, username):
-    subject = 'Welcome to Rugby School Academic Discussion Forum'
-    message = f'Hi {username},\n\nThank you for registering at our platform. We are excited to have you!\n\nBest Regards,\nTeam'
-    from_email = settings.EMAIL_HOST_USER
-
-    send_mail(subject, message, from_email, [to_email])
+    # Send email as HTML
+    email = EmailMultiAlternatives(
+        subject="Activate Your Account",
+        body=email_body,
+        from_email=settings.EMAIL_HOST_USER,
+        to=[user.email]
+    )
+    email.attach_alternative(email_body, "text/html")  # HTML format
+    email.send()
 
 def activate_account(request, uidb64, token):
-  try:
-      uid = force_str(urlsafe_base64_decode(uidb64))
-      user = User.objects.get(pk=uid)
-  except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-      user = None
+    """
+    Handles account activation when the user clicks the activation link.
+    """
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
 
-  if user and default_token_generator.check_token(user, token):
-      user.is_active = True
-      user.save()
-      messages.success(request, "Your account has been activated successfully!")
-      return redirect('login')
-  else:
-      messages.error(request, "Activation link is invalid or has expired.")
-      return redirect('register')
+    if user and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        messages.success(request, "Your account has been activated successfully!")
+        return redirect('login')
+    else:
+        messages.error(request, "Activation link is invalid or has expired.")
+        return redirect('register')
 
 def register(request):
+    """
+    Handles user registration and sends an activation email.
+    """
     if request.method == "POST":
         username = request.POST.get('username')
         email = request.POST.get('email')
@@ -53,20 +73,8 @@ def register(request):
                 user.is_active = False
                 user.save()
 
-                # Generate activation link
-                uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
-                token = default_token_generator.make_token(user)
-                activation_link = f"{request.scheme}://{request.get_host()}/activate/{uidb64}/{token}/"
-                email_body = render_to_string("emails/activation_email.html", {"username" : username, "activation_link" : activation_link,})
-
-              # Send activation email
-                send_mail(
-                    'Activate Your Account',
-                    email_body,
-                    settings.EMAIL_HOST_USER,
-                    [email],
-                    fail_silently=False,
-                )
+                # Send activation email
+                send_activation_email(user, request)
 
                 messages.success(request, 'Account created successfully! Please check your email to activate your account.')
                 return redirect('login')
@@ -76,6 +84,9 @@ def register(request):
     return render(request, 'register.html')
 
 def validate_registration(request, username, email, password, password2):
+    """
+    Validates user registration inputs before creating an account.
+    """
     if User.objects.filter(username=username).exists():
         messages.error(request, 'Username already exists.')
         return False
@@ -89,43 +100,47 @@ def validate_registration(request, username, email, password, password2):
         messages.error(request, 'Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character.')
         return False
     return True
-  
+
 def signin(request):
+    """
+    Handles user login.
+    """
+    if request.method == "POST":
+        email = request.POST['email']
+        password = request.POST['password']
 
-  if request.method == "POST":
-    email = request.POST['email']
-    password = request.POST['password']
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            messages.error(request, "Invalid Credentials")
+            return redirect("login")
 
-    try: 
-      user = User.objects.get(email=email)
-    except User.DoesNotExist:
-      messages.error(request,"Invalid Credentials")
-      return redirect("/login")
+        user = authenticate(request, username=user.username, password=password)
 
+        if user is not None:
+            login(request, user)
+            return redirect("home")
+        else:
+            messages.error(request, "Invalid Credentials")
+            return redirect("login")
 
-
-    user = authenticate(request, username = user.username, password=password)
-
-
-
-    if user is not None:
-      login(request, user)
-      username = user.username
-      return render(request, "index.html",{"username":username})
-
-    else:
-      messages.error(request,"Invalid Credentials")
-      return redirect("login")
-
-  return render(request, 'login.html')
-
+    return render(request, 'login.html')
 
 def signout(request):
+    """
+    Logs the user out.
+    """
     logout(request)
     messages.success(request, "Logged Out Successfully")
     return redirect("home")
 
-# Reset password (implement this function using Django's password reset views for better security)
 def forgot_password(request):
-    # implementation needed
+    """
+    Handles password reset request (Implementation needed).
+    """
+    if request.method == "POST":
+        email = request.POST.get('email')
+        messages.info(request, "Password reset feature coming soon!")
+        return redirect("forgot_password")
+
     return render(request, "forgot_password.html")
