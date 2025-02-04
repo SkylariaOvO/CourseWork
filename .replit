@@ -11,9 +11,9 @@ language = "python3"
 requiredFiles = [".replit", "replit.nix"]
 
 [deployment]
-run = ["sh", "-c", "python manage.py runserver"]
-deploymentTarget = "cloudrun"
+deploymentTarget = "static"
 always-on = true
+publicDir = "./"
 
 [auth]
 pageEnabled = true

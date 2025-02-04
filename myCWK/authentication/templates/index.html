@@ -23,14 +23,19 @@
 
   {% if user.is_authenticated %}
     <h3>Hello {{ user.username }}</h3>
-    <form action="/signout/" method="post">
+    <form action="/logout/" method="post">
       {% csrf_token %}
       <button type="submit">Sign out</button>
     </form>
+
+    <!-- Forum Navigation Button -->
+    <a href="{% url 'forum_home' %}" class="button">Go to Forum</a>
+
   {% else %}
-    <a href="/register" class="button">Register</a>
-    <a href="/login" class="button">Login</a>
-    <a href="/forgot-password" class="button">Forgot Password</a>
+    <a href="{% url 'register' %}" class="button">Register</a>
+    <a href="{% url 'login' %}" class="button">Login</a>
+    <a href="{% url 'password_reset_request' %}" class="button">Forgot Password</a>
+
   {% endif %}
 
   <script src="" async defer></script>

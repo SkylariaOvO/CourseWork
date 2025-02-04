@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Post Detail</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+    <h1>{{ post.title }}</h1>
+    <p>{{ post.content }}</p>
+    <p>By {{ post.author.username }} on {{ post.created_at }}</p>
+
+    <a href="{% url 'forum_home' %}">Back to Forum</a>
+
+</body>
+</html>

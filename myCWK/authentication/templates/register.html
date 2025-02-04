@@ -21,7 +21,7 @@
     {% endif %}
 
     {% csrf_token %}
-    <button type="button"><a href="/">Home</a></button>
+    <a href="{% url 'home' %}" class="button">Home</a>
 
     <label for="username">Username</label>
     <input type="text" id="username" name="username" placeholder="Create a username (only letters and numbers)" required>
@@ -36,7 +36,7 @@
     <input type="password" id="password2" name="password2" placeholder="Confirm Your Password" required>
     <br>
     <button type="submit">Register</button>
-    <button type="button"><a href="/login">Login</a></button>
+    <a href="{% url 'login' %}" class="button">Login</a>
   </form>
 
   <script src="" async defer></script>
