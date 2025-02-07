@@ -1,44 +1,47 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Authentication</title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Authentication</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="">
 </head>
 <body>
 
-  {% for message in messages %}
-  <div class='alert alert-{{ message.tags }} alert-dismissble fade show' role='alert'>
-    <strong>Message:</strong> {{ message }}
-    <button type='button' class='close' data-dismiss='alert' aria-label='close'>
-      <span aria-hidden='true'>&times;</span>
-    </button>
-  </div>
-  {% endfor %}
-  
-  <h3>Welcome to Rugby School Academic Discussion Forum and SSS Timetable</h3>
+ {% for message in messages %}
+ <div class='alert alert-{{ message.tags }} alert-dismissble fade show' role='alert'>
+  <strong>Message:</strong> {{ message }}
+  <button type='button' class='close' data-dismiss='alert' aria-label='close'>
+   <span aria-hidden='true'>&times;</span>
+  </button>
+ </div>
+ {% endfor %}
+ 
+ <h3>Welcome to Rugby School Academic Discussion Forum and SSS Timetable</h3>
 
-  {% if user.is_authenticated %}
-    <h3>Hello {{ user.username }}</h3>
-    <form action="/logout/" method="post">
-      {% csrf_token %}
-      <button type="submit">Sign out</button>
-    </form>
+ {% if user.is_authenticated %}
+  <h3>Hello {{ user.username }}</h3>
+  <form action="/logout/" method="post">
+   {% csrf_token %}
+   <button type="submit">Sign out</button>
+  </form>
 
-    <!-- Forum Navigation Button -->
-    <a href="{% url 'forum_home' %}" class="button">Go to Forum</a>
+  <!-- Forum Navigation Button -->
+  <a href="{% url 'forum_home' %}" class="button">Go to Forum</a>
 
-  {% else %}
-    <a href="{% url 'register' %}" class="button">Register</a>
-    <a href="{% url 'login' %}" class="button">Login</a>
-    <a href="{% url 'password_reset_request' %}" class="button">Forgot Password</a>
+    <!-- Timetable Navigation Button -->
+  <a href="{% url 'timetable' %}" class="button">Go to Timetable</a>
 
-  {% endif %}
+ {% else %}
+  <a href="{% url 'register' %}" class="button">Register</a>
+  <a href="{% url 'login' %}" class="button">Login</a>
+  <a href="{% url 'password_reset_request' %}" class="button">Forgot Password</a>
 
-  <script src="" async defer></script>
+ {% endif %}
+
+ <script src="" async defer></script>
 
 </body>
 </html>

@@ -1,4 +1,4 @@
-modules = ["python-3.11", "postgresql-16"]
+modules = ["nodejs-20", "postgresql-16", "python-3.11"]
 run = "python myCWK/manage.py runserver 0.0.0.0:8000"
 
 [nix]

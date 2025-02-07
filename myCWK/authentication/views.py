@@ -5,10 +5,13 @@ from django.contrib.auth import authenticate, login, logout
 import re
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_str, force_bytes
+from django.utils.timezone import now, timedelta
 from django.template.loader import render_to_string
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMultiAlternatives, send_mail
 from django.conf import settings
+
+Cooldown_Time = timedelta(minutes=1)
 
 # Home Page
 def home(request):
@@ -58,6 +61,13 @@ def register(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         password2 = request.POST.get('password2')
+      
+        last_registration_time = request.session.get("last_registration_time")
+        if last_registration_time:
+            last_registration_time = now() - timedelta(seconds=last_registration_time)
+            if now() < last_registration_time + Cooldown_Time:
+                messages.error(request, "You must wait before registering again.")
+                return redirect("register")
 
         if validate_registration(request, username, email, password, password2):
             try:
@@ -123,9 +133,18 @@ def signout(request):
 def request_reset_password(request):
     if request.method == "POST":
         email = request.POST.get("email")
+      
+        last_reset_time = request.session.get("last_password_reset")
+        if last_reset_time:
+          last_reset_time = now() - timedelta(seconds=last_reset_time) 
+          if now() < last_reset_time + Cooldown_Time:  
+              messages.error(request, "You must wait before requesting another password reset.")
+              return redirect("password_reset_request")
+
         try:
             user = User.objects.get(email=email)
             send_reset_email(user, request)
+            request.session["last_password_reset"] = now().timestamp()
             messages.success(request, "Password reset email sent. Check your inbox.")
         except User.DoesNotExist:
             messages.error(request, "No account found with that email.")

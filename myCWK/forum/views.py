@@ -9,6 +9,7 @@ def forum_home(request):
   posts = Post.objects.all().order_by('created_at')
   return render(request, 'forum_home.html', {'posts':posts})
 
+@login_required
 def post_detail(request, slug):
   post = get_object_or_404(Post, slug=slug) #Fetch the post
   return render(request, 'post_detail.html', {'post': post})
