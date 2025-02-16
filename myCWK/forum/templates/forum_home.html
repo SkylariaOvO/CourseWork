@@ -1,26 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Forum Home</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Forum Home</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="bg-light">
 
-    <h1>Forum Home</h1>
-    <a href="/">Back to Home</a>
+    <div class="container mt-5">
+        <h1 class="text-center text-primary">Forum Home</h1>
 
-    <ul>
-        {% for post in posts %}
-            <li>
-                <a href="{% url 'post_detail' post.slug %}">{{ post.title }}</a> 
-                by {{ post.author.username }} ({{ post.created_at }})
-            </li>
-        {% endfor %}
-    </ul>
+        <div class="text-center mb-3">
+            <a href="/" class="btn btn-outline-secondary">Back to Home</a>
+            <a href="{% url 'create_post' %}" class="btn btn-success">Create New Post</a>
+        </div>
 
-    <a href="{% url 'create_post' %}">Create New Post</a>
+        <div class="list-group">
+            {% for post in posts %}
+                <a href="{% url 'post_detail' post.slug %}" class="list-group-item list-group-item-action">
+                    <h5 class="mb-1">{{ post.title }}</h5>
+                    <small class="text-muted">By {{ post.author.username }} | {{ post.created_at }}</small>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Bootstrap JavaScript Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

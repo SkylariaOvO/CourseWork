@@ -1,37 +1,60 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Authentication</title>
-    <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="">
+    <title>Login</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="bg-light">
 
-  <h3>Login</h3>
-  <form action="/login/" method="post">
-    {% csrf_token %}
-    {% if messages %}
-      {% for message in messages %}
-          <p style="color: {% if message.tags == 'error' %}red{% else %}green{% endif %};">
-              {{ message }}
-          </p>
-      {% endfor %}
-    {% endif %}
-    <label for="email">Email Address</label>
-    <input type="email" id="email" name="email" placeholder="Enter Your Email Address" required>
-    <br>
-    <label for="password">Password</label>
-    <input type="password" id="password" name="password" placeholder="Enter Your Password" required>
-    <br>
-    <button type="submit">Login</button>
-  </form>
-  <a href="/">Home</a>
-  <a href="{% url 'password_reset_request' %}" class="button">Forgot Password</a>
+    <div class="container d-flex justify-content-center align-items-center vh-100">
+        <div class="card shadow-lg p-4" style="max-width: 400px; width: 100%;">
+            <h3 class="text-center text-primary">Login</h3>
 
-  <script src="" async defer>  </script>
+            <!-- Display Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-2" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form action="/login/" method="post">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </div>
+            </form>
+
+            <div class="text-center mt-3">
+                <a href="{% url 'password_reset_request' %}" class="btn btn-outline-warning btn-sm">Forgot Password?</a>
+            </div>
+
+            <div class="text-center mt-2">
+                <a href="/" class="btn btn-link">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JavaScript Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

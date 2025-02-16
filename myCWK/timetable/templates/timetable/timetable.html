@@ -4,154 +4,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Study Session Timetable</title>
+    <title>Supported Study Session Timetable</title>
 
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    
     <!-- FullCalendar and jQuery -->
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
 
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        #calendar { max-width: 80%; margin: auto; padding: 20px; }
-        .fc-daygrid-event { cursor: pointer; }
-        button {
-            background-color: #28a745;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-bottom: 10px;
-        }
-        button:hover { background-color: #218838; }
-        .back-btn { background-color: #dc3545; }
-        .back-btn:hover { background-color: #c82333; }
-
-        /* Modal Styling */
-        #session-modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            width: 300px;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-        }
-        #session-modal input {
-            width: 100%;
-            padding: 8px;
-            margin: 5px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-    </style>
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="{% static 'css/timetable.css' %}">
 </head>
-<body>
+<body class="bg-light">
 
-    <h2>Study Session Calendar</h2>
-    
-    <!-- Button for Popup Modal -->
-    <button id="add-session-btn">Add Study Session</button>
+    <div class="container my-4">
+        <h2 class="text-center">Study Session Calendar</h2>
 
-    <!-- Calendar -->
-    <div id="calendar"></div>
+        <div class="d-flex justify-content-between my-3">
+            <a href="/" class="btn btn-danger">Back to Home</a>
+            <button id="add-session-btn" class="btn btn-success">Add Study Session</button>
+        </div>
 
-    <!-- Popup Modal for Adding Events -->
-    <div id="session-modal">
-        <h3>Add a Study Session</h3>
-        <form id="add-session-form" method="POST">
-            {% csrf_token %}
-            <label>Subject:</label>
-            <input type="text" name="subject" required><br>
-            
-            <label>Teacher:</label>
-            <input type="text" name="teacher" required><br>
-            
-            <label>Date:</label>
-            <input type="date" name="date" required><br>
-            
-            <label>Start Time:</label>
-            <input type="time" name="start_time" required><br>
-            
-            <label>End Time:</label>
-            <input type="time" name="end_time" required><br>
-            
-            <label>Location:</label>
-            <input type="text" name="location" required><br>
-            
-            <button type="submit">Save</button>
-            <button type="button" class="back-btn" id="close-modal">Cancel</button>
-        </form>
+        <!-- Calendar Container -->
+        <div id="calendar-container" class="p-3 bg-white rounded shadow">
+            <div id="calendar"></div>
+        </div>
     </div>
 
-    <!-- JavaScript -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var calendarEl = document.getElementById('calendar');
+    <!-- Modal for Adding Events -->
+    <div class="modal fade" id="session-modal" tabindex="-1" aria-labelledby="session-modal-label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="session-modal-label">Add a Study Session</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-session-form" method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Subject:</label>
+                            <input type="text" name="subject" class="form-control" required>
+                        </div>
 
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth', // Default view is month
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay' // View switch buttons
-                },
-                views: {
-                    dayGridMonth: { buttonText: 'Month' },
-                    timeGridWeek: { buttonText: 'Week' },
-                    timeGridDay: { buttonText: 'Day' }
-                },
-                events: '/timetable/get-events/',  // Fetch events dynamically
-                eventClick: function(info) {
-                    alert(
-                        "Subject: " + info.event.title + 
-                        "\nTeacher: " + info.event.extendedProps.teacher + 
-                        "\nTime: " + info.event.start.toLocaleTimeString() +
-                        "\nLocation: " + info.event.extendedProps.location
-                    );
-                }
-            });
+                        <div class="mb-3">
+                            <label class="form-label">Teacher:</label>
+                            <input type="text" name="teacher" class="form-control" required>
+                        </div>
 
-            calendar.render();
-        });
+                        <div class="mb-3">
+                            <label class="form-label">Date:</label>
+                            <input type="date" name="date" class="form-control" required>
+                        </div>
 
-        // Handle Modal Opening and Closing
-        document.getElementById("add-session-btn").addEventListener("click", function() {
-            document.getElementById("session-modal").style.display = "block";
-        });
+                        <div class="mb-3">
+                            <label class="form-label">Start Time:</label>
+                            <input type="time" name="start_time" class="form-control" required>
+                        </div>
 
-        document.getElementById("close-modal").addEventListener("click", function() {
-            document.getElementById("session-modal").style.display = "none";
-        });
+                        <div class="mb-3">
+                            <label class="form-label">End Time:</label>
+                            <input type="time" name="end_time" class="form-control" required>
+                        </div>
 
-        // Handle Adding Sessions via AJAX
-        document.getElementById("add-session-form").addEventListener("submit", function(event) {
-            event.preventDefault();
-            let formData = new FormData(this);
+                        <div class="mb-3">
+                            <label class="form-label">Location:</label>
+                            <input type="text" name="location" class="form-control" required>
+                        </div>
 
-            let csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Save</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            fetch("/timetable/add-session/", {
-                method: "POST",
-                body: formData,
-                headers: { "X-CSRFToken": csrfToken }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert("Session Added!");
-                    document.getElementById("session-modal").style.display = "none";
-                    location.reload();
-                } else {
-                    alert("Error adding session!");
-                }
-            });
-        });
-    </script>
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script src="{% static 'js/timetable.js' %}"></script>
 
 </body>
 </html>
