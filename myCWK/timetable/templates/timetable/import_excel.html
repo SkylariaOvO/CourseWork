@@ -1,0 +1,14 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+    <h2>Import Study Sessions from Excel</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <p>Select an Excel file to upload:</p>
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-warning">Upload</button>
+    </form>
+    <br>
+    <a href="{% url 'timetable' %}" class="btn btn-secondary">Back to Timetable</a>
+{% endblock %}
+

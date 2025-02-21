@@ -21,8 +21,8 @@ class StudySession(models.Model):
     end_time = models.TimeField()
     location = models.CharField(max_length=100)
     attendance_status = models.CharField(max_length=10, choices=ATTENDANCE_STATUSES, default='Pending')
-    event_type = models.CharField(max_length=10, choices=EVENT_TYPES, default='student')  # Default is student event
-    requires_confirmation = models.BooleanField(default=False)  # Admin events require confirmation
+    event_type = models.CharField(max_length=10, choices=EVENT_TYPES, default='student')  
+    requires_confirmation = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.subject} - {self.student.username} ({self.date} {self.start_time})"

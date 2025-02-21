@@ -1,35 +1,3 @@
-function openConfirmationModal(event) {
-    let eventId = event.id || event.extendedProps.id; 
-    console.log("Opening Confirmation Modal for Event ID:", eventId);
-
-    fetch(`/modal/confirm/${eventId}/`)
-    .then(response => response.text())
-    .then(html => {
-        let modalDiv = document.createElement('div');
-        modalDiv.innerHTML = html;
-        document.body.appendChild(modalDiv);
-
-        let modal = new bootstrap.Modal(modalDiv.querySelector(".modal"));
-        modal.show();
-    });
-}
-
-function openEditModal(event) {
-    let eventId = event.id || event.extendedProps.id;
-    console.log("Opening Edit Modal for Event ID:", eventId);
-
-    fetch(`/modal/edit/${eventId}/`)
-    .then(response => response.text())
-    .then(html => {
-        let modalDiv = document.createElement('div');
-        modalDiv.innerHTML = html;
-        document.body.appendChild(modalDiv);
-
-        let modal = new bootstrap.Modal(modalDiv.querySelector(".modal"));
-        modal.show();
-    });
-}
-
 document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
 
@@ -47,70 +15,71 @@ document.addEventListener('DOMContentLoaded', function() {
             timeGridDay: { buttonText: 'Day' }
         },
         events: '/timetable/get-events/',
+
         eventDidMount: function(info) {
-            console.log("✅ Event Mounted:", info.event.title, info.event.id);
             if (info.event.extendedProps.type === "admin") {
                 info.el.style.backgroundColor = "red";  // Admin event color
             } else {
                 info.el.style.backgroundColor = "blue"; // Student event color
             }
         },
-        editable: true, 
+
+        eventMouseEnter: function(info) {
+            let tooltip = document.createElement("div");
+            tooltip.classList.add("event-tooltip");
+            tooltip.innerHTML = `
+                <strong>${info.event.title}</strong><br>
+                <small>Teacher: ${info.event.extendedProps.teacher || "Unknown"}</small><br>
+                <small>Location: ${info.event.extendedProps.location || "Unknown"}</small>
+            `;
+            tooltip.style.position = "absolute";
+            tooltip.style.backgroundColor = "#000";
+            tooltip.style.color = "#fff";
+            tooltip.style.padding = "5px";
+            tooltip.style.borderRadius = "5px";
+            tooltip.style.top = `${info.jsEvent.clientY + 10}px`;
+            tooltip.style.left = `${info.jsEvent.clientX + 10}px`;
+            tooltip.style.zIndex = "1000";
+            tooltip.setAttribute("id", "event-tooltip");
+            document.body.appendChild(tooltip);
+        },
+
+        eventMouseLeave: function() {
+            let tooltip = document.getElementById("event-tooltip");
+            if (tooltip) tooltip.remove();
+        },
+
+        editable: true,
+
         eventDrop: function(info) {
             if (info.event.extendedProps.type === "admin") {
                 alert("You cannot modify an assigned event.");
                 info.revert();
             }
         },
-        eventClick: function(info) {
-            console.log("✅ Event Clicked:", info.event);
-            console.log("🔹 Event ID:", info.event.id || info.event.extendedProps.id);
-            console.log("🔹 Event Type:", info.event.extendedProps.type);
 
-            if (!info.event.extendedProps.type) {
-                console.error("❌ Event Type is MISSING. Check event creation logic.");
+        eventClick: function(info) {
+            let event = info.event;
+
+            console.log("✅ Event Clicked:", event.title, "ID:", event.id);
+
+            // Prevent editing of admin-assigned events
+            if (event.extendedProps.type === "admin") {
+                alert("❌ You cannot edit an admin-assigned event.");
                 return;
             }
 
-            if (info.event.extendedProps.type === "admin") {
-                openConfirmationModal(info.event);
-            } else {
-                openEditModal(info.event);
-            }
+            // Redirect user to the edit page for this event
+            window.location.href = `/timetable/edit-event/${event.id}/`;
         }
+
+
     });
 
     calendar.render();
 });
 
 
-// Open the modal for adding a new session
 document.getElementById("add-session-btn").addEventListener("click", function() {
-    var modal = new bootstrap.Modal(document.getElementById("session-modal"));
-    modal.show();
-});
-
-// AJAX - Submitting a new session without reloading the page
-document.getElementById("add-session-form").addEventListener("submit", function(event) {
-    event.preventDefault();
-    let formData = new FormData(this);
-
-    let csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
-
-    fetch("/timetable/add-session/", {
-        method: "POST",
-        body: formData,
-        headers: { "X-CSRFToken": csrfToken }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert("Session Added!");
-            var modal = bootstrap.Modal.getInstance(document.getElementById("session-modal"));
-            modal.hide();
-            location.reload();
-        } else {
-            alert("Error adding session!");
-        }
-    });
+    window.location.href = "/timetable/add-session/";
 });
