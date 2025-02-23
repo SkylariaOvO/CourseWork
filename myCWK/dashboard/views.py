@@ -1,8 +1,14 @@
 from django.contrib.auth import models
-from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from forum.models import *
-from timetable.models import *
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
+from django.contrib import messages
+from django.utils.timezone import now
+from django.contrib.auth.models import User
+from django import forms
+import pandas as pd
+from forum.models import Post,Reply
+from timetable.models import StudySession
 
 @login_required
 def home(request):
@@ -22,15 +28,14 @@ def home(request):
 
 @login_required
 def my_posts(request):
-    posts = Post.objects.filter(author=request.user)
-    return render(request, 'dashboard/my_posts.html', {'posts': posts})
+    """Displays the logged-in user's posts."""
+    user_posts = Post.objects.filter(author=request.user)
+    return render(request, "dashboard/my_posts.html", {"posts": user_posts})
 
 @login_required
 def my_events(request):
     events = StudySession.objects.filter(student=request.user)
     return render(request, 'dashboard/my_events.html', {'events': events})
 
-@login_required
-def my_responses(request):
-    responses = ForumResponse.objects.filter(user=request.user)
-    return render(request, 'dashboard/my_responses.html', {'responses': responses})
+
+

@@ -22,13 +22,21 @@
         <!-- Reply Button -->
         <button class="btn btn-sm btn-outline-primary"
                 hx-get="{% url 'reply_form' reply.post.slug reply.slug %}" 
-                hx-target="#reply-form-container-{{ reply.slug }}" 
-                hx-swap="innerHTML">
+                hx-target="#reply-{{ reply.slug }}-children" 
+                hx-swap="beforeend">
             Reply
         </button>
 
-        <!-- Reply Form Container (Ensures only one form per reply) -->
-        <div id="reply-form-container-{{ reply.slug }}"></div>
+        <!-- Delete Reply Button -->
+        {% if reply.author == request.user or request.user.is_staff %}
+            <button class="btn btn-sm btn-outline-danger"
+                    hx-delete="{% url 'delete_reply' reply.slug %}"
+                    hx-target="#reply-{{ reply.slug }}"
+                    hx-swap="outerHTML"
+                    onclick="return confirm('Are you sure you want to delete this reply?');">
+                Delete
+            </button>
+        {% endif %}
 
         <!-- Nested Replies Section -->
         <ul id="reply-{{ reply.slug }}-children">

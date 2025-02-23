@@ -3,11 +3,15 @@ from django.template.loader import render_to_string
 from .models import Post, Reply
 from .forms import PostForm
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.urls import reverse
 from django.db.models import Count
 from django.shortcuts import render
 from better_profanity import profanity
+from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+
 
 def apply_censorship(text):
     profanity.load_censor_words()
@@ -105,4 +109,50 @@ def reply_form(request, slug, parent_slug):
 
     return HttpResponseRedirect(reverse("post_detail", args=[post.slug]))
 
+@login_required
+def delete_reply(request, slug):
+    """Allows users to delete their own replies and admins to delete any reply."""
+    reply = get_object_or_404(Reply, slug=slug)
 
+    if request.user == reply.author or request.user.is_staff:
+        reply.delete()
+        return HttpResponse(status=204)
+
+    return HttpResponse(status=403)
+
+@login_required
+def edit_post(request, slug):
+    """Allows users to edit their own posts."""
+    post = get_object_or_404(Post, slug=slug)
+
+    if request.user != post.author:
+        return HttpResponse(status=403)
+
+    if request.method == "POST":
+        form = PostForm(request.POST, request.FILES, instance=post)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.title = apply_censorship(post.title)
+            post.content = apply_censorship(post.content)
+            post.save()
+            return redirect(reverse('dashboard:my_posts'))
+
+    else:
+        form = PostForm(instance=post)
+
+    return render(request, 'edit_post.html', {'form': form, 'post': post})
+
+
+
+
+@csrf_exempt
+@login_required
+def delete_post(request, slug):
+    """Allows users to delete their own posts and refresh the page after deletion."""
+    post = get_object_or_404(Post, slug=slug)
+
+    if request.user == post.author:
+        post.delete()
+        return HttpResponseRedirect(reverse("dashboard:my_posts"))
+
+    return HttpResponse(status=403)
