@@ -61,7 +61,6 @@ document.addEventListener('DOMContentLoaded', function() {
         eventClick: function(info) {
             let event = info.event;
 
-            console.log("✅ Event Clicked:", event.title, "ID:", event.id);
 
             // Prevent editing of admin-assigned events
             if (event.extendedProps.type === "admin") {

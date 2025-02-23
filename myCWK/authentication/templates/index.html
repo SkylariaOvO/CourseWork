@@ -9,47 +9,95 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            padding: 1rem;
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .profile-dropdown {
+            position: relative;
+            cursor: pointer;
+        }
+        .profile-dropdown img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .dropdown-menu {
+            right: 0;
+            left: auto;
+        }
+        .hero-section {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .hero-section h2 {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+    </style>
 </head>
-<body class="bg-light">
+<body>
 
-    <div class="container mt-5">
-        <!-- Messages -->
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-            <strong>Message:</strong> {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {% endfor %}
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Rugby School Academic Forum</a>
 
-        <div class="card shadow-lg p-4">
-            <h2 class="text-center">Rugby School Academic Discussion Forum & SSS Timetable</h2>
-
-            {% if user.is_authenticated %}
-            <div class="text-center mt-4">
-                <h3 class="text-primary">Hello, {{ user.username }}!</h3>
-
-                <form action="/logout/" method="post" class="mt-3">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">Sign Out</button>
-                </form>
-
-                <div class="d-flex justify-content-center mt-3">
-                    <a href="{% url 'forum_home' %}" class="btn btn-primary mx-2">Go to Forum</a>
-                    <a href="{% url 'timetable' %}" class="btn btn-success mx-2">Go to Timetable</a>
-                </div>
+            <div class="collapse navbar-collapse justify-content-end">
+                {% if user.is_authenticated %}
+                    <div class="dropdown profile-dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="{{ user.profile_picture.url }}" alt="Profile Picture">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                            <li><a class="dropdown-item" href="{% url 'dashboard:home' %}">Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{% url 'forum_home' %}">Forum</a></li>
+                            <li><a class="dropdown-item" href="{% url 'timetable' %}">Timetable</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="{% url 'logout' %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item text-danger">Sign Out</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
+                {% endif %}
             </div>
-
-            {% else %}
-            <div class="text-center mt-4">
-                <a href="{% url 'register' %}" class="btn btn-success mx-2">Register</a>
-                <a href="{% url 'login' %}" class="btn btn-primary mx-2">Login</a>
-                <a href="{% url 'password_reset_request' %}" class="btn btn-warning mx-2">Forgot Password</a>
-            </div>
-            {% endif %}
         </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="container hero-section">
+        <h2>Welcome to the Rugby School Academic Forum & SSS Timetable</h2>
+        <p class="lead">Coursework project created for your efficiency!</p>
+
+        {% if user.is_authenticated %}
+            <div class="mt-4">
+                <a href="{% url 'forum_home' %}" class="btn btn-primary btn-lg mx-2">Go to Forum</a>
+                <a href="{% url 'timetable' %}" class="btn btn-success btn-lg mx-2">Go to Timetable</a>
+                <a href="{% url 'dashboard:home' %}" class="btn btn-warning btn-lg mx-2">Dashboard</a>
+            </div>
+        {% else %}
+            <div class="mt-4">
+                <a href="{% url 'register' %}" class="btn btn-success btn-lg mx-2">Register</a>
+                <a href="{% url 'login' %}" class="btn btn-primary btn-lg mx-2">Login</a>
+                <a href="{% url 'password_reset_request' %}" class="btn btn-warning btn-lg mx-2">Forgot Password</a>
+            </div>
+        {% endif %}
     </div>
 
-    <!-- Bootstrap JavaScript Bundle (Popper.js included) -->
+    <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>

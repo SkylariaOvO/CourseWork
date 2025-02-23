@@ -1,0 +1,26 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card p-4">
+        <h2>Settings</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Change Password</label>
+                <input type="password" class="form-control" name="new_password">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Notification Preferences</label>
+                <select class="form-control" name="notifications">
+                    <option>Enable</option>
+                    <option>Disable</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Save</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

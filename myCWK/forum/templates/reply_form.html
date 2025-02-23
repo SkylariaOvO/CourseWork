@@ -1,0 +1,25 @@
+<form hx-post="{% url 'nested_reply' post.slug parent_reply.slug %}"
+      hx-target="#reply-{{ parent_reply.slug }}-children" 
+      hx-swap="beforeend"
+      hx-trigger="submit"
+      hx-on::after-request="removeReplyForm('{{ parent_reply.slug }}')"
+      enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <textarea name="content" class="form-control reply-box" rows="2" placeholder="Write your reply..." required></textarea>
+
+    <!-- File Upload Section -->
+    <label class="form-label mt-2">Attach an Image or File (optional):</label>
+    <input type="file" name="file" class="form-control mb-2">
+
+    <button type="submit" class="btn btn-sm btn-primary mt-2">Submit Reply</button>
+</form>
+
+<script>
+    function removeReplyForm(replySlug) {
+        let formContainer = document.getElementById(`reply-form-container-${replySlug}`);
+        if (formContainer) {
+            formContainer.innerHTML = ''; // Clears the form container
+        }
+    }
+</script>

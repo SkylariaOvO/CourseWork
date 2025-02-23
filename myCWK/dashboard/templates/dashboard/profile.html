@@ -1,0 +1,23 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card p-4">
+        <h2 class="text-center">Profile Settings</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input type="text" class="form-control" name="username" placeholder="Enter new username">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Profile Picture</label>
+                <input type="file" class="form-control" name="profile_picture">
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -61,28 +61,29 @@ def register(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         password2 = request.POST.get('password2')
-      
-        last_registration_time = request.session.get("last_registration_time")
-        if last_registration_time:
-            last_registration_time = now() - timedelta(seconds=last_registration_time)
-            if now() < last_registration_time + Cooldown_Time:
-                messages.error(request, "You must wait before registering again.")
-                return redirect("register")
+        profile_picture = request.FILES.get('profile_picture')
 
         if validate_registration(request, username, email, password, password2):
             try:
                 user = User.objects.create_user(username=username, email=email, password=password)
-                user.is_active = False
+                user.is_active = False  # Email verification switch
                 user.save()
 
-                send_activation_email(user, request)
+                # PFP stuff
+                profile = user.profile
+                if profile_picture:
+                    profile.profile_picture = profile_picture
+                profile.save()
 
+                send_activation_email(user, request)
                 messages.success(request, 'Account created! Check your email to activate.')
                 return redirect('login')
             except Exception as e:
                 messages.error(request, f'An error occurred: {e}')
                 return redirect('register')
+
     return render(request, 'register.html')
+
 
 # Registration Validation
 def validate_registration(request, username, email, password, password2):

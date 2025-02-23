@@ -1,0 +1,19 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}My Forum Posts{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-center">My Forum Posts</h2>
+    <ul class="list-group">
+        {% for post in posts %}
+            <li class="list-group-item">
+                <a href="{% url 'post_detail' post.slug %}">{{ post.title }}</a>
+                <span class="badge bg-secondary float-end">{{ post.created_at }}</span>
+            </li>
+        {% empty %}
+            <li class="list-group-item text-danger text-center">No forum posts found.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

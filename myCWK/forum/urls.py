@@ -2,7 +2,11 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.forum_home, name='forum_home'),  # List all posts 
-  path('create/', views.create_post, name='create_post'),  # Add a new post
-  path('<slug:slug>/', views.post_detail, name='post_detail'),  # View a post
+    path("", views.forum_home, name="forum_home"),
+    path("create/", views.create_post, name="create_post"),
+    path("<slug:slug>/", views.post_detail, name="post_detail"),
+    path("<slug:slug>/vote/<str:vote_type>/", views.vote_post, name="vote"),
+    path("<slug:slug>/reply/", views.reply_to_post, name="reply"),
+    path("<slug:slug>/reply/<slug:parent_slug>/", views.reply_to_post, name="nested_reply"),
+    path("<slug:slug>/reply_form/<slug:parent_slug>/", views.reply_form, name="reply_form"),
 ]

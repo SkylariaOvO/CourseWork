@@ -90,8 +90,6 @@ def get_events(request):
         }
         for event in events
     ]
-
-    print("DEBUG: Sending Events Data →", data)  # ✅ Debugging Output
     return JsonResponse(data, safe=False)
 
 
@@ -121,11 +119,11 @@ def delete_event(request, event_id):
 
     # Prevent deletion of admin-assigned events
     if event.event_type == "admin":
-        messages.error(request, "❌ You cannot delete an admin-assigned event.")
+        messages.error(request, "You cannot delete an admin-assigned event.")
         return redirect('my_events')
 
     event.delete()
-    messages.success(request, f"✅ Event '{event.subject}' deleted successfully!")
+    messages.success(request, f"Event '{event.subject}' deleted successfully!")
     return redirect('my_events')
 
 
@@ -137,7 +135,7 @@ class ExcelImportForm(forms.Form):
 def import_excel(request):
     """Allows an admin to import study sessions from an Excel file for a selected user."""
     if not request.user.is_staff:
-        messages.error(request, "❌ You do not have permission to access this page.")
+        messages.error(request, "You do not have permission to access this page.")
         return redirect("timetable")
 
     if request.method == "POST":
@@ -149,10 +147,10 @@ def import_excel(request):
             try:
                 df = pd.read_excel(file, engine="openpyxl")
 
-                # Check required columns
+                # Make sure to modify all the columns according to my event modals, and modify the iterrows for data input
                 required_columns = {"subject", "teacher", "date", "start_time", "end_time", "location", "event_type", "attendance_status"}
                 if not required_columns.issubset(df.columns):
-                    messages.error(request, "❌ Excel file must contain these columns: " + ", ".join(required_columns))
+                    messages.error(request, "Excel file must contain these columns: " + ", ".join(required_columns))
                     return redirect("import_excel")
 
                 imported_count = 0
@@ -170,11 +168,11 @@ def import_excel(request):
                     )
                     imported_count += 1
 
-                messages.success(request, f"✅ Successfully imported {imported_count} events for {selected_user.username}!")
+                messages.success(request, f"Successfully imported {imported_count} events for {selected_user.username}!")
                 return redirect("timetable")
 
             except Exception as e:
-                messages.error(request, f"❌ Error processing file: {e}")
+                messages.error(request, f"Error processing file: {e}")
                 return redirect("import_excel")
 
     else:

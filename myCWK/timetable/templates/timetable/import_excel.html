@@ -2,13 +2,37 @@
 
 {% block content %}
     <h2>Import Study Sessions from Excel</h2>
+    <p>
+        Use this form to import study sessions from an Excel file. The file must contain the following columns
+        with the correct format:
+    </p>
+
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
-        <p>Select an Excel file to upload:</p>
+        <p><strong>Select an Excel file to upload:</strong></p>
         {{ form.as_p }}
         <button type="submit" class="btn btn-warning">Upload</button>
     </form>
+
     <br>
     <a href="{% url 'timetable' %}" class="btn btn-secondary">Back to Timetable</a>
-{% endblock %}
 
+    <h4>Example Excel Format</h4>
+    <p>Ensure your file follows this format:</p>
+
+    <pre>
+subject, teacher, date, start_time, end_time, location, event_type, attendance_status
+"Mathematics Quiz", "Mr. Fan", "2025-12-30", "10:00:00", "11:00:00", "Room 101", "student", "Pending"
+"Science Lab", "Dr. Fan", "2025-06-15", "12:00:00", "13:30:00", "Lab A", "admin", "Pending"
+    </pre>
+
+    <p><strong>Note:</strong> Dates must be in YYYY-MM-DD format and times in HH:MM:SS format.</p>
+
+    <h4>Important Notes:</h4>
+    <ul>
+        <li>The file <strong>must be in .xlsx format</strong> (Excel file format).</li>
+        <li>The <strong>event_type</strong> column must be either <code>admin</code> or <code>student</code>.</li>
+        <li>The <strong>attendance_status</strong> column must be either <code>Pending</code>, <code>Confirmed</code>, or <code>Absent</code>.</li>
+    </ul>
+
+{% endblock %}
