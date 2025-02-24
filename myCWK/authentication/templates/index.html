@@ -1,104 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Authentication</title>
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .navbar {
-            padding: 1rem;
-        }
-        .navbar-brand {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        .profile-dropdown {
-            position: relative;
-            cursor: pointer;
-        }
-        .profile-dropdown img {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        .dropdown-menu {
-            right: 0;
-            left: auto;
-        }
-        .hero-section {
-            text-align: center;
-            padding: 60px 20px;
-        }
-        .hero-section h2 {
-            font-size: 2rem;
-            font-weight: bold;
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rugby School Academic Forum</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+    .navbar {
+      padding: 1rem;
+    }
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .profile-dropdown img,
+    .profile-img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .dropdown-menu {
+      right: 0;
+      left: auto;
+    }
+    .hero-section {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .hero-section h2 {
+      font-size: 2rem;
+      font-weight: bold;
+    }
+    .card {
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+  </style>
 </head>
 <body>
-
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="#">Rugby School Academic Forum</a>
-
-            <div class="collapse navbar-collapse justify-content-end">
-                {% if user.is_authenticated %}
-                    <div class="dropdown profile-dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="{{ user.profile_picture.url }}" alt="Profile Picture">
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                            <li><a class="dropdown-item" href="{% url 'dashboard:home' %}">Dashboard</a></li>
-                            <li><a class="dropdown-item" href="{% url 'forum_home' %}">Forum</a></li>
-                            <li><a class="dropdown-item" href="{% url 'timetable' %}">Timetable</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <form action="{% url 'logout' %}" method="post">
-                                    {% csrf_token %}
-                                    <button type="submit" class="dropdown-item text-danger">Sign Out</button>
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
-                {% else %}
-                    <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
-                {% endif %}
-            </div>
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <div class="container hero-section">
-        <h2>Welcome to the Rugby School Academic Forum & SSS Timetable</h2>
-        <p class="lead">Coursework project created for your efficiency!</p>
-
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand" href="{% url 'home' %}">Rugby School Academic Forum</a>
+      <div class="collapse navbar-collapse justify-content-end">
         {% if user.is_authenticated %}
-            <div class="mt-4">
-                <a href="{% url 'forum_home' %}" class="btn btn-primary btn-lg mx-2">Go to Forum</a>
-                <a href="{% url 'timetable' %}" class="btn btn-success btn-lg mx-2">Go to Timetable</a>
-                <a href="{% url 'dashboard:home' %}" class="btn btn-warning btn-lg mx-2">Dashboard</a>
-            </div>
+          <div class="dropdown profile-dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture">
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+              <li><a class="dropdown-item" href="{% url 'dashboard:home' %}">Dashboard</a></li>
+              <li><a class="dropdown-item" href="{% url 'forum_home' %}">Forum</a></li>
+              <li><a class="dropdown-item" href="{% url 'timetable' %}">Timetable</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <form action="{% url 'logout' %}" method="post">
+                  {% csrf_token %}
+                  <button type="submit" class="dropdown-item text-danger">Sign Out</button>
+                </form>
+              </li>
+            </ul>
+          </div>
         {% else %}
-            <div class="mt-4">
-                <a href="{% url 'register' %}" class="btn btn-success btn-lg mx-2">Register</a>
-                <a href="{% url 'login' %}" class="btn btn-primary btn-lg mx-2">Login</a>
-                <a href="{% url 'password_reset_request' %}" class="btn btn-warning btn-lg mx-2">Forgot Password</a>
-            </div>
+          <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
         {% endif %}
+      </div>
     </div>
+  </nav>
 
-    <!-- Bootstrap JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Hero Section -->
+  <div class="container hero-section">
+    <h2>Welcome to the Rugby School Academic Forum & SSS Timetable</h2>
+    <p class="lead">Coursework project created for your efficiency!</p>
+    {% if user.is_authenticated %}
+      <div class="mt-4">
+        <a href="{% url 'forum_home' %}" class="btn btn-primary btn-lg mx-2">Go to Forum</a>
+        <a href="{% url 'timetable' %}" class="btn btn-success btn-lg mx-2">Go to Timetable</a>
+        <a href="{% url 'dashboard:home' %}" class="btn btn-warning btn-lg mx-2">Dashboard</a>
+      </div>
+    {% else %}
+      <div class="mt-4">
+        <a href="{% url 'register' %}" class="btn btn-success btn-lg mx-2">Register</a>
+        <a href="{% url 'login' %}" class="btn btn-primary btn-lg mx-2">Login</a>
+        <a href="{% url 'password_reset_request' %}" class="btn btn-warning btn-lg mx-2">Forgot Password</a>
+      </div>
+    {% endif %}
+  </div>
 
+  <!-- Bootstrap JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -4,20 +4,76 @@
 
 {% block content %}
 <div class="container">
-    <div class="card p-4">
-        <h2 class="text-center">Profile Settings</h2>
-        <form method="POST">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label class="form-label">Username</label>
-                <input type="text" class="form-control" name="username" placeholder="Enter new username">
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Profile Picture</label>
-                <input type="file" class="form-control" name="profile_picture">
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Save Changes</button>
-        </form>
+    <div class="card p-4 mb-4">
+        <div class="text-center">
+            <img src="{{ profile_user.profile.profile_picture.url }}" alt="Profile Picture" class="profile-img mb-3">
+            <h2>{{ profile_user.username }}</h2>
+            {% if profile_user.first_name or profile_user.last_name %}
+                <p>{{ profile_user.first_name }} {{ profile_user.last_name }}</p>
+            {% endif %}
+            <hr>
+            <p>{{ profile_user.profile.bio|linebreaks }}</p>
+        </div>
     </div>
+
+    {% if is_owner %}
+        <!-- Editable Profile Settings (for owner) -->
+        <div class="card p-4">
+            <h3 class="text-center mb-4">Profile Settings</h3>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-control" name="username" placeholder="Enter new username" value="{{ profile_user.username }}">
+                </div>
+                <div class="row">
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label">First Name</label>
+                        <input type="text" class="form-control" name="first_name" placeholder="Enter first name" value="{{ profile_user.first_name }}">
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" class="form-control" name="last_name" placeholder="Enter last name" value="{{ profile_user.last_name }}">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Profile Picture</label>
+                    <input type="file" class="form-control" name="profile_picture">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Bio</label>
+                    <textarea class="form-control" name="bio" rows="3" placeholder="Tell us something about yourself">{{ profile_user.profile.bio }}</textarea>
+                </div>
+                <hr>
+                <h4 class="mt-4">Change Password</h4>
+                <div class="mb-3">
+                    <label class="form-label">New Password</label>
+                    <input type="password" class="form-control" name="new_password" placeholder="Enter new password">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Confirm New Password</label>
+                    <input type="password" class="form-control" name="confirm_password" placeholder="Confirm new password">
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+            </form>
+        </div>
+    {% else %}
+        <div class="card p-4">
+            <h3>Posts by {{ profile_user.username }}</h3>
+            {% if user_posts %}
+                {% for post in user_posts %}
+                    <div class="card mb-3" style="font-size: 0.9rem;">
+                        <div class="card-body p-2">
+                            <h5 class="card-title">{{ post.title }}</h5>
+                            <p class="card-text">{{ post.content|truncatewords:15 }}</p>
+                            <a href="{% url 'post_detail' post.slug %}" class="btn btn-sm btn-primary">Read More</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>{{ profile_user.username }} has not made any posts yet.</p>
+            {% endif %}
+        </div>
+    {% endif %}
 </div>
 {% endblock %}

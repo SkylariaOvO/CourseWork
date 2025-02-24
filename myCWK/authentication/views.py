@@ -54,6 +54,22 @@ def activate_account(request, uidb64, token):
         messages.error(request, "Activation link is invalid or has expired.")
         return redirect('register')
 
+# Registration Validation
+def validate_registration(request, username, email, password, password2):
+    if User.objects.filter(username=username).exists():
+        messages.error(request, 'Username already exists.')
+        return False
+    if User.objects.filter(email=email).exists():
+        messages.error(request, 'Email already exists.')
+        return False
+    if password != password2:
+        messages.error(request, 'Passwords do not match.')
+        return False
+    if not re.match(r'^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$', password):
+        messages.error(request, 'Password must be strong.')
+        return False
+    return True
+
 # User Registration
 def register(request):
     if request.method == "POST":
@@ -73,6 +89,8 @@ def register(request):
                 profile = user.profile
                 if profile_picture:
                     profile.profile_picture = profile_picture
+                else:
+                    profile.profile_picture = 'default.png'  # Assign default if no picture
                 profile.save()
 
                 send_activation_email(user, request)
@@ -83,23 +101,6 @@ def register(request):
                 return redirect('register')
 
     return render(request, 'register.html')
-
-
-# Registration Validation
-def validate_registration(request, username, email, password, password2):
-    if User.objects.filter(username=username).exists():
-        messages.error(request, 'Username already exists.')
-        return False
-    if User.objects.filter(email=email).exists():
-        messages.error(request, 'Email already exists.')
-        return False
-    if password != password2:
-        messages.error(request, 'Passwords do not match.')
-        return False
-    if not re.match(r'^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$', password):
-        messages.error(request, 'Password must be strong.')
-        return False
-    return True
 
 # User Sign-in
 def signin(request):

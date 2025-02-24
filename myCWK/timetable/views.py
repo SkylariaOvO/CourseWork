@@ -7,8 +7,9 @@ from django.utils.timezone import now
 from django.contrib.auth.models import User
 from django import forms
 import pandas as pd
-
-
+from datetime import datetime, timedelta
+from django.core.mail import send_mail
+from django.conf import settings
 
 @login_required
 def add_session(request):
@@ -27,15 +28,17 @@ def add_session(request):
             return redirect('add_session')
 
         try:
-            StudySession.objects.create(student=request.user,
-                                        subject=subject,
-                                        teacher=teacher,
-                                        date=date,
-                                        start_time=start_time,
-                                        end_time=end_time,
-                                        location=location,
-                                        event_type="student",
-                                        attendance_status="Pending")
+            StudySession.objects.create(
+                student=request.user,
+                subject=subject,
+                teacher=teacher,
+                date=date,
+                start_time=start_time,
+                end_time=end_time,
+                location=location,
+                event_type="student",
+                attendance_status="Pending"
+            )
             messages.success(request, "Study session added successfully!")
             return redirect('timetable')
 
@@ -51,10 +54,9 @@ def timetable_view(request):
 
 @login_required
 def my_events(request):
-    """Displays all events specifie the logged-in user."""
+    """Displays all events for the logged-in user."""
     events = StudySession.objects.filter(student=request.user)
     return render(request, 'timetable/my_events.html', {'events': events})
-
 
 @login_required
 def confirm_event(request, event_id):
@@ -62,13 +64,12 @@ def confirm_event(request, event_id):
     event = get_object_or_404(StudySession, id=event_id, student=request.user)
     event.attendance_status = "Confirmed"
     event.save()
-    messages.success(request,
-                     f"Event '{event.subject}' confirmed successfully!")
+    messages.success(request, f"Event '{event.subject}' confirmed successfully!")
     return redirect('my_events')
 
 @login_required
 def get_events(request):
-    """Fetch events for FullCalendar from my DB."""
+    """Fetch events for FullCalendar from the DB."""
     events = StudySession.objects.filter(student=request.user)
 
     if not events.exists():
@@ -92,7 +93,6 @@ def get_events(request):
     ]
     return JsonResponse(data, safe=False)
 
-
 @login_required
 def edit_event(request, event_id):
     """Allows a user to edit an event."""
@@ -106,8 +106,7 @@ def edit_event(request, event_id):
         event.end_time = request.POST.get("end_time", event.end_time)
         event.location = request.POST.get("location", event.location)
         event.save()
-        messages.success(request,
-                         f"Event '{event.subject}' updated successfully!")
+        messages.success(request, f"Event '{event.subject}' updated successfully!")
         return redirect('my_events')
 
     return render(request, 'timetable/edit_event.html', {'event': event})
@@ -125,7 +124,6 @@ def delete_event(request, event_id):
     event.delete()
     messages.success(request, f"Event '{event.subject}' deleted successfully!")
     return redirect('my_events')
-
 
 class ExcelImportForm(forms.Form):
     file = forms.FileField()
@@ -146,8 +144,6 @@ def import_excel(request):
 
             try:
                 df = pd.read_excel(file, engine="openpyxl")
-
-                # Make sure to modify all the columns according to my event modals, and modify the iterrows for data input
                 required_columns = {"subject", "teacher", "date", "start_time", "end_time", "location", "event_type", "attendance_status"}
                 if not required_columns.issubset(df.columns):
                     messages.error(request, "Excel file must contain these columns: " + ", ".join(required_columns))
@@ -174,8 +170,51 @@ def import_excel(request):
             except Exception as e:
                 messages.error(request, f"Error processing file: {e}")
                 return redirect("import_excel")
-
     else:
         form = ExcelImportForm()
 
     return render(request, "timetable/import_excel.html", {"form": form})
+
+def send_admin_event_reminders():
+    """
+    Checks for admin-assigned study sessions scheduled to start in one hour and sends reminder emails.
+
+    Assumes:
+    - StudySession.event_type == "admin" for admin-assigned events.
+    - StudySession has a BooleanField 'reminder_sent' (default=False) to prevent duplicate reminders.
+
+    This function should be scheduled to run periodically (via a management command, cron job, or Celery Beat).
+    """
+    # Calculate the target time (one hour from now) and a small window (±5 minutes)
+    target_time = now() + timedelta(hours=1)
+    window_start = target_time - timedelta(minutes=5)
+    window_end = target_time + timedelta(minutes=5)
+
+    # Filter for admin events on today's date that haven't been reminded yet
+    admin_events = StudySession.objects.filter(
+        event_type="admin",
+        reminder_sent=False,
+        date=now().date()
+    )
+
+    for event in admin_events:
+        # Combine event.date and event.start_time to form the event's datetime
+        event_datetime = datetime.combine(event.date, event.start_time)
+        # Check if the event starts within our reminder window
+        if window_start <= event_datetime <= window_end:
+            subject = f"Reminder: Upcoming Admin Assigned Event '{event.subject}'"
+            message = (
+                f"Dear {event.student.username},\n\n"
+                f"This is a reminder that your admin-assigned event '{event.subject}' is scheduled to start at "
+                f"{event.start_time} on {event.date} at {event.location}.\n\n"
+                f"Please ensure you are prepared.\n\nBest regards,\nYour Academic Team"
+            )
+            recipient_list = [event.student.email]
+            try:
+                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list)
+                # Mark the event as having been reminded to avoid duplicate emails
+                event.reminder_sent = True
+                event.save()
+            except Exception as e:
+                # In production, use proper logging instead of print statements
+                print(f"Error sending reminder for event {event.id}: {e}")

@@ -144,15 +144,27 @@ def edit_post(request, slug):
 
 
 
-
 @csrf_exempt
 @login_required
 def delete_post(request, slug):
-    """Allows users to delete their own posts and refresh the page after deletion."""
+    """Allows users to delete their own posts"""
     post = get_object_or_404(Post, slug=slug)
 
-    if request.user == post.author:
+    if request.user == post.author or request.user.is_staff:
         post.delete()
         return HttpResponseRedirect(reverse("dashboard:my_posts"))
 
     return HttpResponse(status=403)
+
+from django.shortcuts import redirect
+
+@login_required
+def delete_reply(request, slug):
+    """Allows users to delete their own replies"""
+    reply = get_object_or_404(Reply, slug=slug)
+
+    if request.user == reply.author or request.user.is_staff:
+        reply.delete()
+        return HttpResponseRedirect(reverse("post_detail", args=[reply.post.slug])) 
+
+    return HttpResponse(status=403) 
