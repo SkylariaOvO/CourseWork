@@ -58,6 +58,18 @@ INSTALLED_APPS = [
   'forum', 'timetable','dashboard'
 ]
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'OPTIONS': {
+            'options': '-c statement_timeout=30000'
+        },
+        'CONN_MAX_AGE': 60,
+        'POOL_SIZE': 5,
+        'ATOMIC_REQUESTS': False,
+    }
+}
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
 
