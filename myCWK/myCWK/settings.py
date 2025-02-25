@@ -109,14 +109,19 @@ WSGI_APPLICATION = 'myCWK.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django_db_connection_pool.backends.postgresql',
         'NAME': 'neondb',
         'USER': 'neondb_owner',
         'PASSWORD': 'eNHWkd1I3hXF',
-        'HOST': 'ep-white-hat-a4px9qng.us-east-1.aws.neon.tech',
+        'HOST': 'ep-white-hat-a4px9qng-pooler.us-east-1.aws.neon.tech',
         'PORT': '5432',
         'OPTIONS': {
             'sslmode': 'require',
+        },
+        'POOL_OPTIONS': {
+            'POOL_SIZE': 5,
+            'MAX_OVERFLOW': 2,
+            'RECYCLE': 300,
         },
     }
 }
