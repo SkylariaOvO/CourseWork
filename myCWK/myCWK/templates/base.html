@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Dashboard{% endblock %}</title>
-  
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Rugby School Academic Forum{% endblock %}</title>
   <!-- Bootstrap CSS -->
+  <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  
   <style>
     body {
       background-color: #f8f9fa;
@@ -31,23 +33,11 @@
       right: 0;
       left: auto;
     }
-    .hero-section {
-      text-align: center;
-      padding: 60px 20px;
-    }
-    .hero-section h2 {
-      font-size: 2rem;
-      font-weight: bold;
-    }
-    .card {
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-    }
   </style>
 </head>
 <body>
 
+  <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
       <a class="navbar-brand" href="{% url 'home' %}">Rugby School Academic Forum</a>
@@ -77,11 +67,12 @@
     </div>
   </nav>
 
-  <div class="container">
+  <!-- Main Content -->
+  <div class="container mt-4">
     {% block content %}{% endblock %}
   </div>
 
-  <!-- Bootstrap JS -->
+  <!-- Bootstrap JavaScript -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

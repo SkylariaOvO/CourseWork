@@ -13,9 +13,20 @@ from django.conf import settings
 
 Cooldown_Time = timedelta(minutes=1)
 
-# Home Page
+from forum.models import Post, Reply
+from timetable.models import StudySession
+
 def home(request):
-    return render(request, 'index.html')
+    top_posts = sorted(Post.objects.all(), key=lambda post: post.total_votes(), reverse=True)[:5]
+    
+    upcoming_sessions = StudySession.objects.filter(date__gte=now(), date__lte=now() + timedelta(days=7)).order_by('date')
+    
+
+    return render(request, 'index.html', {
+        'top_posts': top_posts,
+        'upcoming_sessions': upcoming_sessions
+    })
+
 
 # Send Activation Email
 def send_activation_email(user, request):

@@ -22,3 +22,14 @@ buttonEnabled = false
 [[ports]]
 localPort = 8000
 externalPort = 80
+
+[workflows]
+runButton = "Run"
+
+[[workflows.workflow]]
+name = "Run"
+author = 4026445
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python myCWK/manage.py runserver"
