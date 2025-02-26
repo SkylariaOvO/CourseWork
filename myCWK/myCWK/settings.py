@@ -19,8 +19,6 @@ from django.conf.urls.static import static
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -45,9 +43,11 @@ ALLOWED_HOSTS = [
     '7e064f1e-ba07-4c51-8aeb-16dd5770b440-00-2pepcvgohnfx4.riker.replit.dev'
 ]
 CSRF_TRUSTED_ORIGINS = [
-    'https://7e064f1e-ba07-4c51-8aeb-16dd5770b440-00-2pepcvgohnfx4.riker.replit.dev:8080', 'https://7e064f1e-ba07-4c51-8aeb-16dd5770b440-00-2pepcvgohnfx4.riker.replit.dev:8000','https://7e064f1e-ba07-4c51-8aeb-16dd5770b440-00-2pepcvgohnfx4.riker.replit.dev:', 'https://7e064f1e-ba07-4c51-8aeb-16dd5770b440-00-2pepcvgohnfx4.riker.replit.dev'
+    'https://7e064f1e-ba07-4c51-8aeb-16dd5770b440-00-2pepcvgohnfx4.riker.replit.dev:8080',
+    'https://7e064f1e-ba07-4c51-8aeb-16dd5770b440-00-2pepcvgohnfx4.riker.replit.dev:8000',
+    'https://7e064f1e-ba07-4c51-8aeb-16dd5770b440-00-2pepcvgohnfx4.riker.replit.dev:',
+    'https://7e064f1e-ba07-4c51-8aeb-16dd5770b440-00-2pepcvgohnfx4.riker.replit.dev'
 ]
-
 
 # Application definition
 
@@ -55,7 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.admin', 'django.contrib.auth',
     'django.contrib.contenttypes', 'django.contrib.sessions',
     'django.contrib.messages', 'django.contrib.staticfiles', 'authentication',
-  'forum', 'timetable','dashboard'
+    'forum', 'timetable', 'dashboard'
 ]
 
 DATABASES = {
@@ -72,9 +72,7 @@ DATABASES = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-
-  
-  'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -82,13 +80,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-
 ROOT_URLCONF = 'myCWK.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR,"myCWK","templates")],
+        'DIRS': [os.path.join(BASE_DIR, "myCWK", "templates")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -100,7 +97,6 @@ TEMPLATES = [
         },
     },
 ]
-
 
 WSGI_APPLICATION = 'myCWK.wsgi.application'
 
@@ -166,4 +162,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 from django.urls import reverse_lazy
 
-LOGIN_URL = reverse_lazy('login') 
+LOGIN_URL = reverse_lazy('login')

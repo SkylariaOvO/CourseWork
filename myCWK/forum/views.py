@@ -71,8 +71,6 @@ def vote_post(request, slug, vote_type):
     return HttpResponseRedirect(reverse('post_detail', args=[slug]))
 
 
-
-
 @login_required
 def reply_to_post(request, slug, parent_slug=None):
     """Handles both top-level replies and nested replies dynamically with attachments."""
@@ -92,11 +90,10 @@ def reply_to_post(request, slug, parent_slug=None):
                 file=file
             )
 
-            if request.headers.get('HX-Request'):
-                html = render_to_string("reply_partial.html", {"reply": new_reply, "children": []})
-                return HttpResponse(html)
+        return redirect("post_detail", slug=post.slug)
 
-    return HttpResponseRedirect(reverse("post_detail", args=[post.slug]))
+    return redirect("post_detail", slug=post.slug)
+
 
 
 def reply_form(request, slug, parent_slug):

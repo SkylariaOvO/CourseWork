@@ -1,75 +1,58 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Study Session</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 50px auto;
-            width: 50%;
-            text-align: center;
-        }
-        form {
-            background-color: #f4f4f4;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 0px 10px #ccc;
-        }
-        input, select {
-            width: 90%;
-            padding: 8px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        button {
-            background-color: #28a745;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #218838;
-        }
-        .back-btn {
-            background-color: #dc3545;
-        }
-        .back-btn:hover {
-            background-color: #c82333;
-        }
-    </style>
-</head>
-<body>
+{% extends "base.html" %}
 
-    <h2>Add a Study Session</h2>
-    <form method="POST">
-        {% csrf_token %}
+{% block title %}Add Study Session{% endblock %}
 
-        <label>Subject:</label>
-        <input type="text" name="subject" required><br>
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Add a Study Session</h2>
 
-        <label>Teacher:</label>
-        <input type="text" name="teacher" required><br>
+    <!-- Study Session Form -->
+    <div class="card shadow-lg p-4 mx-auto" style="max-width: 600px;">
+        <form method="POST">
+            {% csrf_token %}
 
-        <label>Date:</label>
-        <input type="date" name="date" required><br>
+            <!-- Subject Input -->
+            <div class="mb-3">
+                <label for="subject" class="form-label">Subject:</label>
+                <input type="text" id="subject" name="subject" class="form-control" required>
+            </div>
 
-        <label>Start Time:</label>
-        <input type="time" name="start_time" required><br>
+            <!-- Teacher Input -->
+            <div class="mb-3">
+                <label for="teacher" class="form-label">Teacher:</label>
+                <input type="text" id="teacher" name="teacher" class="form-control" required>
+            </div>
 
-        <label>End Time:</label>
-        <input type="time" name="end_time" required><br>
+            <!-- Date Input -->
+            <div class="mb-3">
+                <label for="date" class="form-label">Date:</label>
+                <input type="date" id="date" name="date" class="form-control" required>
+            </div>
 
-        <label>Location:</label>
-        <input type="text" name="location" required><br>
+            <!-- Time Inputs -->
+            <div class="mb-3">
+                <label for="start_time" class="form-label">Start Time:</label>
+                <input type="time" id="start_time" name="start_time" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="end_time" class="form-label">End Time:</label>
+                <input type="time" id="end_time" name="end_time" class="form-control" required>
+            </div>
 
-        <button type="submit">Save Session</button>
-        <button type="button" class="back-btn" onclick="window.location.href='{% url 'timetable' %}'">Cancel</button>
-    </form>
+            <!-- Location Input -->
+            <div class="mb-3">
+                <label for="location" class="form-label">Location:</label>
+                <input type="text" id="location" name="location" class="form-control" required>
+            </div>
 
-</body>
-</html>
+            <!-- Action Buttons -->
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-success">Save Session</button>
+                <button type="button" class="btn btn-danger" onclick="window.location.href='{% url 'timetable' %}'">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,4 +1,4 @@
-{% extends 'dashboard/base.html' %}
+{% extends "base.html" %}
 
 {% block title %}My Study Sessions{% endblock %}
 
@@ -6,69 +6,75 @@
 <div class="container mt-4">
     <h2 class="text-center">My Study Sessions</h2>
 
+    <!-- Navigation Buttons -->
     <div class="d-flex justify-content-between my-3">
-        <a href="/" class="btn btn-danger">Back to Home</a>
+        <a href="{% url 'home' %}" class="btn btn-danger">Back to Home</a>
         <a href="{% url 'timetable' %}" class="btn btn-secondary">Back to Timetable</a>
     </div>
 
+    <!-- Display Messages -->
     {% if messages %}
         {% for message in messages %}
             <div class="alert alert-success">{{ message }}</div>
         {% endfor %}
     {% endif %}
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Subject</th>
-                <th>Teacher</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Location</th>
-                <th>Attendance</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for event in events %}
+    <!-- Study Sessions Table -->
+    <div class="card shadow-lg p-3">
+        <table class="table table-striped">
+            <thead>
                 <tr>
-                    <td>{{ event.subject }}</td>
-                    <td>{{ event.teacher }}</td>
-                    <td>{{ event.date }}</td>
-                    <td>{{ event.start_time }} - {{ event.end_time }}</td>
-                    <td>{{ event.location }}</td>
-                    <td>
-                        {% if event.attendance_status == "Pending" %}
-                            <span class="badge bg-warning">Pending</span>
-                        {% elif event.attendance_status == "Confirmed" %}
-                            <span class="badge bg-success">Confirmed</span>
-                        {% else %}
-                            <span class="badge bg-danger">{{ event.attendance_status }}</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if event.attendance_status == "Pending" and event.event_type == "admin" %}
-                            <a href="{% url 'confirm_event' event.id %}" class="btn btn-success btn-sm">Confirm</a>
-                        {% endif %}
+                    <th>Subject</th>
+                    <th>Teacher</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Location</th>
+                    <th>Attendance</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in events %}
+                    <tr>
+                        <td>{{ event.subject }}</td>
+                        <td>{{ event.teacher }}</td>
+                        <td>{{ event.date }}</td>
+                        <td>{{ event.start_time }} - {{ event.end_time }}</td>
+                        <td>{{ event.location }}</td>
+                        <td>
+                            {% if event.attendance_status == "Pending" %}
+                                <span class="badge bg-warning">Pending</span>
+                            {% elif event.attendance_status == "Confirmed" %}
+                                <span class="badge bg-success">Confirmed</span>
+                            {% else %}
+                                <span class="badge bg-danger">{{ event.attendance_status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if event.attendance_status == "Pending" and event.event_type == "admin" %}
+                                <a href="{% url 'confirm_event' event.id %}" class="btn btn-success btn-sm">Confirm</a>
+                            {% endif %}
 
-                        {% if event.event_type == "student" %}
-                            <a href="{% url 'edit_event' event.id %}" class="btn btn-primary btn-sm">Edit</a>
-                            <a href="{% url 'delete_event' event.id %}" class="btn btn-danger btn-sm"
-                               onclick="return confirmDelete('{{ event.subject }}');">
-                                Delete
-                            </a>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="7" class="text-center text-danger">No study sessions found.</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                            {% if event.event_type == "student" %}
+                                <a href="{% url 'edit_event' event.id %}" class="btn btn-primary btn-sm">Edit</a>
+                                <a href="{% url 'delete_event' event.id %}" class="btn btn-danger btn-sm"
+                                   onclick="return confirmDelete('{{ event.subject }}');">
+                                    Delete
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-danger">No study sessions found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
+<!-- JavaScript for Delete Confirmation -->
 <script>
     function confirmDelete(subject) {
         return confirm(`Are you sure you want to delete the event: "${subject}"?`);
