@@ -37,10 +37,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 SECRET_KEY = 'django-insecure-dru0=ao-r3lpl79$!=ma4jyx$l%1g#!7vu-$42)+o3z41ii#v%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
-    '7e064f1e-ba07-4c51-8aeb-16dd5770b440-00-2pepcvgohnfx4.riker.replit.dev'
+    '7e064f1e-ba07-4c51-8aeb-16dd5770b440-00-2pepcvgohnfx4.riker.replit.dev', 'siweifan.com'
 ]
 CSRF_TRUSTED_ORIGINS = [
     'https://7e064f1e-ba07-4c51-8aeb-16dd5770b440-00-2pepcvgohnfx4.riker.replit.dev:8080',
@@ -72,6 +72,7 @@ DATABASES = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -154,6 +155,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_URL = "/static/"
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media/"
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
