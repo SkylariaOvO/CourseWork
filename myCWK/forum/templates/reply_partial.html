@@ -1,35 +1,27 @@
 <li class="list-group-item border-0" id="reply-{{ reply.slug }}">
     <div class="ms-4 d-flex align-items-center">
-        {% if reply.author.is_authenticated %}
-            <!-- Profile Picture & Link to Profile Page -->
-            <a href="{% url 'dashboard:profile' reply.author.username %}">
-                <img src="{{ reply.author.profile.profile_picture.url }}" 
-                     alt="Profile Picture"
-                     class="rounded-circle me-2"
-                     style="width: 40px; height: 40px; object-fit: cover;">
-            </a>
+        <!-- Profile Picture & Link to Profile Page -->
+        <a href="{% url 'dashboard:profile' reply.author.username %}">
+            <img src="{{ reply.author.profile.profile_picture.url }}" alt="Profile Picture" 
+                 class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+        </a>
 
-            <div>
+        <div>
+            <strong>
+                <a href="{% url 'dashboard:profile' reply.author.username %}" class="text-dark">
+                    {{ reply.author.username }}
+                </a>
+            </strong>
+            {% if reply.parent and reply.parent.author %}
+                <span class="text-muted"> replied to </span> 
                 <strong>
-                    <a href="{% url 'dashboard:profile' reply.author.username %}" class="text-dark">
-                        {{ reply.author.username }}
+                    <a href="{% url 'dashboard:profile' reply.parent.author.username %}" class="text-dark">
+                        {{ reply.parent.author.username }}
                     </a>
                 </strong>
-
-                {% if reply.parent and reply.parent.author.is_authenticated %}
-                    <span class="text-muted"> replied to </span> 
-                    <strong>
-                        <a href="{% url 'dashboard:profile' reply.parent.author.username %}" class="text-dark">
-                            {{ reply.parent.author.username }}
-                        </a>
-                    </strong>
-                {% endif %}
-                <span class="text-muted"> - {{ reply.created_at|date:"F d, Y H:i" }}</span>
-            </div>
-        {% else %}
-            <!-- Fallback for Anonymous Users -->
-            <strong class="text-muted">[Unknown User]</strong>
-        {% endif %}
+            {% endif %}
+            <span class="text-muted"> - {{ reply.created_at|date:"F d, Y H:i" }}</span>
+        </div>
     </div>
 
     <p class="mt-2 mb-2">{{ reply.content }}</p>
@@ -42,22 +34,17 @@
     <!-- Display Attached File -->
     {% if reply.file %}
         <p class="mt-2">
-            <a href="{{ reply.file.url }}" class="btn btn-sm btn-outline-secondary" target="_blank" download>
-                Download Attachment
-            </a>
+            <a href="{{ reply.file.url }}" class="btn btn-sm btn-outline-secondary" target="_blank" download>Download Attachment</a>
         </p>
     {% endif %}
 
     <!-- Reply Button -->
     <button class="btn btn-sm btn-outline-primary"
             hx-get="{% url 'reply_form' reply.post.slug reply.slug %}" 
-            hx-target="#reply-form-container-{{ reply.slug }}" 
-            hx-swap="innerHTML">
+            hx-target="#reply-{{ reply.slug }}-children" 
+            hx-swap="beforeend">
         Reply
     </button>
-
-    <!-- Reply Form Container -->
-    <div id="reply-form-container-{{ reply.slug }}"></div>
 
     <!-- Delete Reply Button -->
     {% if reply.author == request.user or request.user.is_staff %}
@@ -71,11 +58,9 @@
     {% endif %}
 
     <!-- Nested Replies Section -->
-    {% if reply.children.exists %}
-        <ul id="reply-{{ reply.slug }}-children">
-            {% for child in reply.children.all %}
-                {% include 'reply_partial.html' with reply=child %}
-            {% endfor %}
-        </ul>
-    {% endif %}
+    <ul id="reply-{{ reply.slug }}-children">
+        {% for child in reply.children.all %}
+            {% include 'reply_partial.html' with reply=child %}
+        {% endfor %}
+    </ul>
 </li>

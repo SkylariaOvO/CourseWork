@@ -10,6 +10,9 @@ import pandas as pd
 from datetime import datetime, timedelta
 from django.core.mail import send_mail
 from django.conf import settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 @login_required
 def add_session(request):
@@ -175,22 +178,14 @@ def import_excel(request):
 
     return render(request, "timetable/import_excel.html", {"form": form})
 
+
+
 def send_admin_event_reminders():
-    """
-    Checks for admin-assigned study sessions scheduled to start in one hour and sends reminder emails.
-
-    Assumes:
-    - StudySession.event_type == "admin" for admin-assigned events.
-    - StudySession has a BooleanField 'reminder_sent' (default=False) to prevent duplicate reminders.
-
-    This function should be scheduled to run periodically (via a management command, cron job, or Celery Beat).
-    """
-    # Calculate the target time (one hour from now) and a small window (±5 minutes)
     target_time = now() + timedelta(hours=1)
     window_start = target_time - timedelta(minutes=5)
     window_end = target_time + timedelta(minutes=5)
 
-    # Filter for admin events on today's date that haven't been reminded yet
+    # Filter for admin events happening today that haven't been reminded yet
     admin_events = StudySession.objects.filter(
         event_type="admin",
         reminder_sent=False,
@@ -198,23 +193,31 @@ def send_admin_event_reminders():
     )
 
     for event in admin_events:
-        # Combine event.date and event.start_time to form the event's datetime
         event_datetime = datetime.combine(event.date, event.start_time)
-        # Check if the event starts within our reminder window
+
+        # Convert to timezone-aware datetime
+        event_datetime = now().replace(
+            year=event_datetime.year, 
+            month=event_datetime.month,
+            day=event_datetime.day,
+            hour=event_datetime.hour,
+            minute=event_datetime.minute
+        )
+
         if window_start <= event_datetime <= window_end:
             subject = f"Reminder: Upcoming Admin Assigned Event '{event.subject}'"
             message = (
                 f"Dear {event.student.username},\n\n"
                 f"This is a reminder that your admin-assigned event '{event.subject}' is scheduled to start at "
                 f"{event.start_time} on {event.date} at {event.location}.\n\n"
-                f"Please ensure you are prepared.\n\nBest regards,\nYour Academic Team"
+                f"Please ensure you are prepared.\n\nBest regards,\nSchool SMT Team"
             )
             recipient_list = [event.student.email]
+
             try:
                 send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list)
-                # Mark the event as having been reminded to avoid duplicate emails
                 event.reminder_sent = True
                 event.save()
+                logger.info(f"Reminder sent for event {event.id}.")
             except Exception as e:
-                # In production, use proper logging instead of print statements
-                print(f"Error sending reminder for event {event.id}: {e}")
+                logger.error(f"Error sending reminder for event {event.id}: {e}")

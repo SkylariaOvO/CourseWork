@@ -24,30 +24,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         },
 
-        eventMouseEnter: function(info) {
-            let tooltip = document.createElement("div");
-            tooltip.classList.add("event-tooltip");
-            tooltip.innerHTML = `
-                <strong>${info.event.title}</strong><br>
-                <small>Teacher: ${info.event.extendedProps.teacher || "Unknown"}</small><br>
-                <small>Location: ${info.event.extendedProps.location || "Unknown"}</small>
-            `;
-            tooltip.style.position = "absolute";
-            tooltip.style.backgroundColor = "#000";
-            tooltip.style.color = "#fff";
-            tooltip.style.padding = "5px";
-            tooltip.style.borderRadius = "5px";
-            tooltip.style.top = `${info.jsEvent.clientY + 10}px`;
-            tooltip.style.left = `${info.jsEvent.clientX + 10}px`;
-            tooltip.style.zIndex = "1000";
-            tooltip.setAttribute("id", "event-tooltip");
-            document.body.appendChild(tooltip);
-        },
-
-        eventMouseLeave: function() {
-            let tooltip = document.getElementById("event-tooltip");
-            if (tooltip) tooltip.remove();
-        },
 
         editable: true,
 

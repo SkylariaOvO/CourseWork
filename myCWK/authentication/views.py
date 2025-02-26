@@ -18,9 +18,12 @@ from timetable.models import StudySession
 
 def home(request):
     top_posts = sorted(Post.objects.all(), key=lambda post: post.total_votes(), reverse=True)[:5]
-    
-    upcoming_sessions = StudySession.objects.filter(date__gte=now(), date__lte=now() + timedelta(days=7)).order_by('date')
-    
+
+    upcoming_sessions = StudySession.objects.filter(
+        student=request.user,
+        date__gte=now().date(),
+        date__lte=now().date() + timedelta(days=7)
+    ).order_by("date", "start_time")
 
     return render(request, 'index.html', {
         'top_posts': top_posts,

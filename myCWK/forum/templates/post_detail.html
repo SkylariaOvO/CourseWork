@@ -13,8 +13,31 @@
 
     <!-- Post Card -->
     <div class="card shadow-lg p-4">
+        <div class="d-flex align-items-center mb-3">
+            {% if post.author.is_authenticated %}
+                <!-- Profile Picture & Link to Profile Page -->
+                <a href="{% url 'dashboard:profile' post.author.username %}">
+                    <img src="{{ post.author.profile.profile_picture.url }}"
+                         alt="Profile Picture"
+                         class="rounded-circle me-2"
+                         style="width: 50px; height: 50px; object-fit: cover;">
+                </a>
+
+                <div>
+                    <strong>
+                        <a href="{% url 'dashboard:profile' post.author.username %}" class="text-dark">
+                            {{ post.author.username }}
+                        </a>
+                    </strong>
+                    <span class="text-muted"> - {{ post.created_at|date:"F d, Y H:i" }}</span>
+                </div>
+            {% else %}
+                <!-- Fallback for Anonymous Users -->
+                <strong class="text-muted">[Unknown User]</strong>
+            {% endif %}
+        </div>
+
         <h1 class="text-primary">{{ post.title }}</h1>
-        <p class="text-muted">By <strong>{{ post.author.username }}</strong> on {{ post.created_at }}</p>
         <hr>
         <p class="fs-5">{{ post.content }}</p>
 
@@ -51,7 +74,7 @@
         </div>
     </div> <!-- Closing post card -->
 
-    <!-- Reply Form (HTMX-powered) -->
+    <!-- Reply Form -->
     <div class="card shadow-lg p-4 mt-4">
         <h4>Reply to this post:</h4>
         <form hx-post="{% url 'reply' post.slug %}" hx-target="#replies" hx-swap="beforeend">
@@ -61,21 +84,20 @@
         </form>
     </div>
 
-        <!-- Replies Section -->
-        <div class="mt-4">
-            <h4>Replies</h4>
-            <ul class="list-group list-group-flush" id="replies">
-                {% for reply in all_replies %}
-                    {% if not reply.parent %}
-                        {% include 'reply_partial.html' with reply=reply %}
-                    {% endif %}
-                {% empty %}
-                    <li class="list-group-item text-muted">No replies yet.</li>
-                {% endfor %}
-            </ul>
-
+    <!-- Replies Section -->
+    <div class="mt-4">
+        <h4>Replies</h4>
+        <ul class="list-group list-group-flush" id="replies">
+            {% for reply in all_replies %}
+                {% if not reply.parent %}
+                    {% include 'reply_partial.html' with reply=reply %}
+                {% endif %}
+            {% empty %}
+                <li class="list-group-item text-muted">No replies yet.</li>
+            {% endfor %}
+        </ul>
     </div>
-</div>
+
 
 <!-- Back Function -->
 <script>

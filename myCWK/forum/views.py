@@ -73,12 +73,12 @@ def vote_post(request, slug, vote_type):
 
 @login_required
 def reply_to_post(request, slug, parent_slug=None):
-    """Handles both top-level replies and nested replies dynamically with attachments."""
+    """Handles both top-level replies and nested replies dynamically with HTMX & attachments."""
     post = get_object_or_404(Post, slug=slug)
     parent_reply = get_object_or_404(Reply, slug=parent_slug) if parent_slug else None 
 
     if request.method == "POST":
-        content = request.POST.get("content")
+        content = request.POST.get("content", "").strip()
         file = request.FILES.get("file")  # Handle file uploads
 
         if content:
@@ -90,6 +90,11 @@ def reply_to_post(request, slug, parent_slug=None):
                 file=file
             )
 
+            # If request is from HTMX, return only the new reply
+            if request.headers.get("HX-Request"):
+                return render(request, "reply_partial.html", {"reply": new_reply})
+
+        # Redirect normally if not HTMX
         return redirect("post_detail", slug=post.slug)
 
     return redirect("post_detail", slug=post.slug)

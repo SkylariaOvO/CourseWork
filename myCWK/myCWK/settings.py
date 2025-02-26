@@ -37,6 +37,8 @@ SECRET_KEY = config("SECRET_KEY", default='django-insecure-dru0=ao-r3lpl79$!=ma4
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
+
+
 ALLOWED_HOSTS = [
     '7e064f1e-ba07-4c51-8aeb-16dd5770b440-00-2pepcvgohnfx4.riker.replit.dev',
     'siweifan.com',
@@ -182,6 +184,3 @@ if not DEBUG:
     MEDIA_URL = '/media/'
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL,
-                          document_root=settings.MEDIA_ROOT)
