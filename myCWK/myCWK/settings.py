@@ -36,8 +36,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 SECRET_KEY = config("SECRET_KEY", default='django-insecure-dru0=ao-r3lpl79$!=ma4jyx$l%1g#!7vu-$42)+o3z41ii#v%')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config("DEBUG", default=False, cast=bool)
-
+#DEBUG = config("DEBUG", default=False, cast=bool)
+DEBUG = True
 
 ALLOWED_HOSTS = [
     '7e064f1e-ba07-4c51-8aeb-16dd5770b440-00-2pepcvgohnfx4.riker.replit.dev',
