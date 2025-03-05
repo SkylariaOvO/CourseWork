@@ -28,7 +28,7 @@ class Post(models.Model):
             self.save(update_fields=["slug"])
 
         else:
-            super(Post, self).save(*args, **kwargs)  # Regular save
+            super(Post, self).save(*args, **kwargs)
 
     def total_votes(self):
         return self.upvotes.count() - self.downvotes.count()

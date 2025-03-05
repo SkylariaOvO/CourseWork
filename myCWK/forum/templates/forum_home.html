@@ -6,6 +6,18 @@
 <div class="container mt-5">
     <h1 class="text-center text-primary">Forum Home</h1>
 
+    <!-- Search Bar and Filter Dropdown -->
+    <form method="GET" action="{% url 'forum_home' %}" class="d-flex justify-content-center mb-3">
+        <input type="text" name="search" class="form-control w-50" placeholder="Search posts..." value="{{ query }}">
+        <select name="filter" class="form-select mx-2">
+            <option value="">Sort By</option>
+            <option value="latest" {% if filter_option == "latest" %}selected{% endif %}>Latest</option>
+            <option value="popular" {% if filter_option == "popular" %}selected{% endif %}>Most Upvoted</option>
+            <option value="oldest" {% if filter_option == "oldest" %}selected{% endif %}>Oldest</option>
+        </select>
+        <button type="submit" class="btn btn-primary mx-2">Apply</button>
+    </form>
+
     <!-- Navigation buttons -->
     <div class="d-flex justify-content-center mb-3">
         <a href="{% url 'home' %}" class="btn btn-outline-secondary mx-2">Back to Home</a>
