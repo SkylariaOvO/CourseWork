@@ -16,19 +16,19 @@ class Post(models.Model):
     image = models.ImageField(upload_to="post_images/", null=True, blank=True)
     file = models.FileField(upload_to="post_files/", null=True, blank=True)
 
+    
     def save(self, *args, **kwargs):
         if not self.slug:
             base_slug = slugify(self.title)[:390]
-            slug = base_slug
-            counter = 1
 
-            while Post.objects.filter(slug=slug).exists():
-                slug = f"{base_slug}-{counter}"
-                counter += 1
+            super(Post, self).save(*args, **kwargs)  
+            unique_id = self.id
 
-            self.slug = slug  # Assign unique slug
+            self.slug = f"{base_slug}-{unique_id}" 
+            self.save(update_fields=["slug"])
 
-        super(Post, self).save(*args, **kwargs)
+        else:
+            super(Post, self).save(*args, **kwargs)  # Regular save
 
     def total_votes(self):
         return self.upvotes.count() - self.downvotes.count()

@@ -11,18 +11,36 @@ from better_profanity import profanity
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.db.models import Q
 
 
 def apply_censorship(text):
     profanity.load_censor_words()
     return profanity.censor(text)
-    
-def forum_home(request):
-    posts = Post.objects.annotate(
-        popularity=Count("upvotes") - Count("downvotes")
-    ).order_by("-popularity", "-created_at")  # Sort by popularity, then newest posts
 
-    return render(request, "forum_home.html", {"posts": posts})
+def forum_home(request):
+    query = request.GET.get("search", "")
+    filter_option = request.GET.get("filter", "")
+
+    posts = Post.objects.all()
+
+    if query:
+        posts = posts.filter(Q(title__icontains=query) | Q(content__icontains=query))
+
+    if filter_option == "latest":
+        posts = posts.order_by("-created_at")
+    elif filter_option == "popular":
+        posts = posts.order_by("-upvotes")
+    elif filter_option == "oldest":
+        posts = posts.order_by("created_at")
+
+    context = {
+        "posts": posts,
+        "query": query,
+        "filter_option": filter_option,
+    }
+    return render(request, "forum_home.html", context)
+
 
 @login_required
 def post_detail(request, slug):
