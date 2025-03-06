@@ -82,9 +82,9 @@ def validate_registration(request, username, email, password, password2):
     if password != password2:
         messages.error(request, 'Passwords do not match.')
         return False
-    if not re.match(r'^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$', password):
-        messages.error(request, 'Password must be strong.')
-        return False
+    #if not re.match(r'^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$', password):
+        #messages.error(request, 'Password must be strong.')
+        #return False
     return True
 
 # User Registration
