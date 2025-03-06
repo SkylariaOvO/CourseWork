@@ -36,8 +36,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 SECRET_KEY = config("SECRET_KEY", default='_qpyc4cj7E9R6wKXuHRf9YvgcgZThojm9FFrajTrsUByTT0Iumn4JT_5RrllnYJKQ7A')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-#DEBUG = config("DEBUG", default=False, cast=bool)
-DEBUG = False
+DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
 
 ALLOWED_UPLOAD_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.pdf', '.docx', '.xlsx', '.txt']
 
