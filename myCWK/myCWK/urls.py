@@ -24,14 +24,10 @@ from django.http import HttpResponseForbidden
 def block_admin(request):
     return HttpResponseForbidden("Admin panel is restricted.")
 
+
+
 urlpatterns = [
     path("supersecretadmin/", admin.site.urls) if settings.DEBUG else path("admin/", block_admin),
-]
-
-
-
-urlpatterns = [
-    path('admin/', admin.site.urls),
     path('',include('authentication.urls')), path('forum/', include('forum.urls')),
     path('timetable/', include('timetable.urls')),path('dashboard/', include('dashboard.urls', namespace='dashboard')),
 ]
