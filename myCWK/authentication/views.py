@@ -205,8 +205,6 @@ def reset_password(request, uidb64, token):
 
             if password != password2:
                 messages.error(request, "Passwords do not match.")
-            elif not re.match(r'^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$', password):
-                messages.error(request, "Password must meet complexity requirements.")
             else:
                 user.set_password(password)
                 user.save()
