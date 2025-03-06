@@ -19,6 +19,16 @@ from django.contrib import admin
 from django.conf.urls.static import static
 from django.urls import path,include, re_path
 from django.views.static import serve
+from django.http import HttpResponseForbidden
+
+def block_admin(request):
+    return HttpResponseForbidden("Admin panel is restricted.")
+
+urlpatterns = [
+    path("supersecretadmin/", admin.site.urls) if settings.DEBUG else path("admin/", block_admin),
+]
+
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),

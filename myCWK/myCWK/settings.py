@@ -33,11 +33,15 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-SECRET_KEY = config("SECRET_KEY", default='django-insecure-dru0=ao-r3lpl79$!=ma4jyx$l%1g#!7vu-$42)+o3z41ii#v%')
+SECRET_KEY = config("SECRET_KEY", default='_qpyc4cj7E9R6wKXuHRf9YvgcgZThojm9FFrajTrsUByTT0Iumn4JT_5RrllnYJKQ7A')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = config("DEBUG", default=False, cast=bool)
 DEBUG = False
+
+ALLOWED_UPLOAD_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.pdf', '.docx', '.xlsx', '.txt']
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
 
 ALLOWED_HOSTS = [
     '7e064f1e-ba07-4c51-8aeb-16dd5770b440-00-2pepcvgohnfx4.riker.replit.dev',

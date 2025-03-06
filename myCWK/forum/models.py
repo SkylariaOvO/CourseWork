@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth.models import User
+from myCWK.validators import validate_file_extension
 
 class Post(models.Model):
     title = models.CharField(max_length=400)
@@ -12,21 +13,17 @@ class Post(models.Model):
     upvotes = models.ManyToManyField(User, related_name="post_upvotes", blank=True)
     downvotes = models.ManyToManyField(User, related_name="post_downvotes", blank=True)
 
-    # Attachments
-    image = models.ImageField(upload_to="post_images/", null=True, blank=True)
-    file = models.FileField(upload_to="post_files/", null=True, blank=True)
+    # Attachments with file type validation
+    image = models.ImageField(upload_to="post_images/", null=True, blank=True, validators=[validate_file_extension])
+    file = models.FileField(upload_to="post_files/", null=True, blank=True, validators=[validate_file_extension])
 
-    
     def save(self, *args, **kwargs):
         if not self.slug:
             base_slug = slugify(self.title)[:390]
-
             super(Post, self).save(*args, **kwargs)  
             unique_id = self.id
-
             self.slug = f"{base_slug}-{unique_id}" 
             self.save(update_fields=["slug"])
-
         else:
             super(Post, self).save(*args, **kwargs)
 
@@ -45,11 +42,10 @@ class Reply(models.Model):
     slug = models.SlugField(max_length=400, unique=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    # Attachments
-    image = models.ImageField(upload_to="reply_images/", null=True, blank=True)
-    file = models.FileField(upload_to="reply_files/", null=True, blank=True)
+    # Attachments with file type validation
+    image = models.ImageField(upload_to="reply_images/", null=True, blank=True, validators=[validate_file_extension])
+    file = models.FileField(upload_to="reply_files/", null=True, blank=True, validators=[validate_file_extension])
 
-    
     def save(self, *args, **kwargs):
         if not self.slug or self.slug == "":
             base_slug = slugify(f"{self.post.title}-{self.author.username[:6]}")[:390]
@@ -63,6 +59,3 @@ class Reply(models.Model):
             self.slug = slug  # Assign unique slug
 
         super(Reply, self).save(*args, **kwargs)
-
-
-

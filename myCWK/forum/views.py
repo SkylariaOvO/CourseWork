@@ -12,6 +12,8 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.db.models import Q
+from django.core.exceptions import ValidationError
+from myCWK.validators import validate_file_extension
 
 
 def apply_censorship(text):
@@ -53,11 +55,11 @@ def post_detail(request, slug):
 @login_required
 def create_post(request):
     if request.method == "POST":
-        form = PostForm(request.POST, request.FILES)  #Accepts file uploads
+        form = PostForm(request.POST, request.FILES)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
-            post.title = apply_censorship(post.title)#Censor title
+            post.title = apply_censorship(post.title)
             post.content = apply_censorship(post.content)
             post.save()
             return redirect('post_detail', slug=post.slug)
@@ -89,6 +91,8 @@ def vote_post(request, slug, vote_type):
     return HttpResponseRedirect(reverse('post_detail', args=[slug]))
 
 
+
+
 @login_required
 def reply_to_post(request, slug, parent_slug=None):
     """Handles both top-level replies and nested replies dynamically with HTMX & attachments."""
@@ -97,7 +101,14 @@ def reply_to_post(request, slug, parent_slug=None):
 
     if request.method == "POST":
         content = request.POST.get("content", "").strip()
-        file = request.FILES.get("file")  # Handle file uploads
+        file = request.FILES.get("file")
+
+
+        if file:
+            try:
+                validate_file_extension(file)
+            except ValidationError as e:
+                return JsonResponse({"error": str(e)}, status=400)
 
         if content:
             new_reply = Reply.objects.create(
@@ -108,11 +119,10 @@ def reply_to_post(request, slug, parent_slug=None):
                 file=file
             )
 
-            # If request is from HTMX, return only the new reply
+
             if request.headers.get("HX-Request"):
                 return render(request, "reply_partial.html", {"reply": new_reply})
 
-        # Redirect normally if not HTMX
         return redirect("post_detail", slug=post.slug)
 
     return redirect("post_detail", slug=post.slug)
